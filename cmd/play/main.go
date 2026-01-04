@@ -1,26 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
-	"os"
-	"strings"
+
+	"github.com/messy-coding/wordle-solver/internal/words"
 )
 
-const wordListFilePath string = "data/word_list.txt"
 const wordLength int = 5
 const maxNumGuesses int = 6
-
-func getFullWordList() ([]string, error) {
-	wordList := []string{}
-	dat, err := os.ReadFile(wordListFilePath)
-	if err != nil {
-		return wordList, fmt.Errorf("unable to read word list - err: %s", err)
-	}
-	wordList = strings.Split(string(dat), "\n")
-	return wordList, nil
-}
 
 func selectRandomWord(wordList []string) string {
 	return wordList[rand.Intn(len(wordList))]
@@ -114,7 +102,7 @@ func playGame(wordList []string, answer string) error {
 }
 
 func main() {
-	wordList, err := getFullWordList()
+	wordList, err := words.GetWordList()
 	if err != nil {
 		log.Fatal(err)
 	}
