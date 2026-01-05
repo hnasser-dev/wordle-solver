@@ -21,7 +21,24 @@ const (
 var correctGuessColourPattern = [wordLength]Colour{Green, Green, Green, Green, Green}
 
 func getOptimalNextGuess(remainingWords []string) string {
-	// TODO - have a proper calculation
+	/*
+		Iterate through all remaining words
+		For each word, calculate the colour distribution pattern across all other words
+		...
+	*/
+
+	// bitsPerGuess := map[string]float64{}
+
+	for _, potentialGuess := range remainingWords {
+		colourPatternNums := map[[5]Colour]int{}
+		for _, potentialAnswer := range remainingWords {
+			colourPattern := getColourPattern(potentialGuess, potentialAnswer)
+			colourPatternNums[colourPattern]++
+		}
+		// TODO - calculate numBitsOfInfo (weighted sum of probabilities, then convert to bits using -log(p))
+		// bitsPerGuess[potentialGuess] = numBitsOfInfo
+	}
+
 	return "hello"
 }
 
