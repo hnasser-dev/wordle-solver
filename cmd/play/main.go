@@ -63,11 +63,18 @@ func getColourPattern(guess string, answer string) [wordLength]Colour {
 }
 
 // TODO - fix this so it works - currently gets stuck - and not sure if this even makes sense anyway
-func filterWordListBasedOnLatestGuess(wordList []string, guessColourPattern [wordLength]Colour, answer string) []string {
+func filterWordListBasedOnLatestGuess(wordList []string, guessColourPattern [wordLength]Colour, prevGuess string, answer string) []string {
 	filteredWordList := []string{}
 	for _, word := range wordList {
-		wordCouldBeAnswer := reflect.DeepEqual(guessColourPattern, getColourPattern(word, answer))
+		// prevent repeating the same guess
+		if word == prevGuess {
+			continue
+		}
+		wordColourPattern := getColourPattern(word, answer)
+		// log.Printf("%s is %v", word, wordColourPattern)
+		wordCouldBeAnswer := reflect.DeepEqual(guessColourPattern, wordColourPattern)
 		if wordCouldBeAnswer {
+			// log.Printf("%s + %v could be %s", word, guessColourPattern, answer)
 			filteredWordList = append(filteredWordList, word)
 		}
 	}
@@ -78,6 +85,7 @@ func getOptimalNextGuess(remainingWords []string) string {
 
 	entropies := map[string]float64{}
 
+	// TODO - fix entropies calculation: I think it may be wrong
 	for _, potentialGuess := range remainingWords {
 
 		colourPatternNums := map[[wordLength]Colour]int{}
@@ -97,18 +105,24 @@ func getOptimalNextGuess(remainingWords []string) string {
 		entropies[potentialGuess] = numBitsOfInfo
 	}
 
-	pairs := make([]guessEntropy, 0, len(entropies))
+	entropiesHighToLow := make([]guessEntropy, 0, len(entropies))
 
 	for guess, bits := range entropies {
-		pairs = append(pairs, guessEntropy{guess, bits})
+		entropiesHighToLow = append(entropiesHighToLow, guessEntropy{guess, bits})
 	}
 
-	sort.Slice(pairs, func(i, j int) bool { return pairs[i].Bits > pairs[j].Bits })
+	sort.Slice(entropiesHighToLow, func(i, j int) bool { return entropiesHighToLow[i].Bits > entropiesHighToLow[j].Bits })
 
 	// TODO - remove
-	log.Printf("Top 3 pairs: %v", pairs[:3])
+	nextGuess := entropiesHighToLow[0].Guess
+	log.Printf("Next guess: %s (Top 10 pairs: %v)", nextGuess, entropiesHighToLow[:10])
 
-	return pairs[0].Guess
+	entropiesLowToHigh := make([]guessEntropy, 0, len(entropies))
+	entropiesLowToHigh = append(entropiesLowToHigh, entropiesHighToLow...)
+	sort.Slice(entropiesLowToHigh, func(i, j int) bool { return entropiesLowToHigh[i].Bits < entropiesLowToHigh[j].Bits })
+	log.Printf("Bottom 10 pairs: %v", entropiesLowToHigh[:10])
+
+	return nextGuess
 }
 
 func playGame(answer string, wordList []string) error {
@@ -127,8 +141,7 @@ func playGame(answer string, wordList []string) error {
 			gameWon = true
 			break
 		}
-		// is this dumb?
-		remainingWordList = filterWordListBasedOnLatestGuess(remainingWordList, guessColourPattern, answer)
+		remainingWordList = filterWordListBasedOnLatestGuess(remainingWordList, guessColourPattern, guess, answer)
 		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
 	}
 
