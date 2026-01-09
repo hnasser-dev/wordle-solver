@@ -6,6 +6,7 @@ import (
 	"math"
 	"reflect"
 	"sort"
+	"strings"
 
 	"github.com/messy-coding/wordle-solver/internal/words"
 )
@@ -30,10 +31,6 @@ type guessOutcome struct {
 	guess        string
 	distribution guessDistribution
 	entropyBits  float64
-}
-
-func (g guessOutcome) String() string {
-	return fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", g.guess, g.entropyBits)
 }
 
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
@@ -74,18 +71,21 @@ func getColourPattern(guess string, answer string) colourPattern {
 
 func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 
-	guessDistributions := make(map[string]guessDistribution, len(remainingWords))
+	guessDistributions := map[string]guessDistribution{}
 
 	for _, potentialGuess := range remainingWords {
 		dist := guessDistribution{}
 		for _, potentialAnswer := range remainingWords {
+			if potentialAnswer == potentialGuess {
+				continue // prevent infinite loop of guesses
+			}
 			colourPattern := getColourPattern(potentialGuess, potentialAnswer)
 			dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
 		}
 		guessDistributions[potentialGuess] = dist
 	}
 
-	guessOutcomes := make([]guessOutcome, len(guessDistributions))
+	guessOutcomes := []guessOutcome{}
 
 	// entropy calculations
 	for guess, dist := range guessDistributions {
@@ -116,13 +116,20 @@ func playGame(answer string, wordList []string) error {
 
 	for !gameWon && len(guesses) < maxNumGuesses {
 
-		nextOutcomes := getSortedGuessOutcomes(wordList)
-		for _, outcome := range nextOutcomes[:3] {
-			log.Println(outcome)
+		nextOutcomes := getSortedGuessOutcomes(remainingWordList)
+
+		// just for logging
+		topN := int(math.Min(3, float64(len(nextOutcomes))))
+		topNAsStr := make([]string, topN)
+		for i := range topN {
+			outcome := nextOutcomes[i]
+			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
 		}
+		log.Printf("top %d next outcomes: %v", topN, strings.Join(topNAsStr, ","))
 
 		nextOutcome := nextOutcomes[0]
 		guesses = append(guesses, nextOutcome.guess)
+		log.Printf("guess #%d: '%s'", len(guesses), nextOutcome.guess)
 
 		nextColourPattern := getColourPattern(nextOutcome.guess, answer)
 		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
@@ -132,8 +139,10 @@ func playGame(answer string, wordList []string) error {
 
 		remainingWordList = nextOutcome.distribution[nextColourPattern]
 		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
-		log.Printf("guesses: %v", guesses)
+		log.Println()
 	}
+
+	log.Printf("guesses: %v", guesses)
 
 	if gameWon {
 		log.Printf("You won in %d guesses!", len(guesses))
@@ -146,13 +155,12 @@ func playGame(answer string, wordList []string) error {
 }
 
 func main() {
-
 	wordList, err := words.GetWordList()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	answer := "hello"
+	answer := "eight"
 	log.Printf("(The answer is: %q - shhhhhh!)", answer)
 
 	if err := playGame(answer, wordList); err != nil {
