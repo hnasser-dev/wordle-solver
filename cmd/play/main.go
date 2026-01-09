@@ -111,29 +111,32 @@ func playGame(answer string, wordList []string) error {
 	remainingWordList := make([]string, len(wordList))
 	copy(remainingWordList, wordList)
 
+	guesses := []string{}
 	gameWon := false
-	numGuesses := 0
 
-	for numGuesses < maxNumGuesses {
-		numGuesses++
+	for !gameWon && len(guesses) < maxNumGuesses {
+
 		nextOutcomes := getSortedGuessOutcomes(wordList)
 		for _, outcome := range nextOutcomes[:3] {
 			log.Println(outcome)
 		}
 
-		// log.Printf("next outcomes: %s...", strings.Join(nextOutcomes[:3], ","))
 		nextOutcome := nextOutcomes[0]
+		guesses = append(guesses, nextOutcome.guess)
+
 		nextColourPattern := getColourPattern(nextOutcome.guess, answer)
 		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
 			gameWon = true
 			break
 		}
+
 		remainingWordList = nextOutcome.distribution[nextColourPattern]
 		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
+		log.Printf("guesses: %v", guesses)
 	}
 
 	if gameWon {
-		log.Printf("You won in %d guesses!", numGuesses)
+		log.Printf("You won in %d guesses!", len(guesses))
 	} else {
 		log.Println("You lost!")
 	}
