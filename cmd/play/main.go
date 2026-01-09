@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"reflect"
@@ -13,24 +14,33 @@ const wordLength int = 5
 
 const maxNumGuesses int = 6
 
-type Colour uint8
-
 const (
-	Grey Colour = iota
+	Grey colour = iota
 	Yellow
 	Green
 )
 
-type guessEntropy struct {
-	Guess string
-	Bits  float64
+type colour uint8
+
+type colourPattern [wordLength]colour
+
+type guessDistribution map[colourPattern][]string
+
+type guessOutcome struct {
+	guess        string
+	distribution guessDistribution
+	entropyBits  float64
 }
 
-var correctGuessColourPattern = [wordLength]Colour{Green, Green, Green, Green, Green}
+func (g guessOutcome) String() string {
+	return fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", g.guess, g.entropyBits)
+}
 
-func getColourPattern(guess string, answer string) [wordLength]Colour {
+var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
 
-	colourPatternSlice := [wordLength]Colour{Grey, Grey, Grey, Grey, Grey}
+func getColourPattern(guess string, answer string) colourPattern {
+
+	colourPatternSlice := [wordLength]colour{Grey, Grey, Grey, Grey, Grey}
 
 	numCharsInAnswer := map[byte]int{}
 	for i := 0; i < len(answer); i++ {
@@ -62,67 +72,38 @@ func getColourPattern(guess string, answer string) [wordLength]Colour {
 	return colourPatternSlice
 }
 
-// TODO - fix this so it works - currently gets stuck - and not sure if this even makes sense anyway
-func filterWordListBasedOnLatestGuess(wordList []string, guessColourPattern [wordLength]Colour, prevGuess string, answer string) []string {
-	filteredWordList := []string{}
-	for _, word := range wordList {
-		// prevent repeating the same guess
-		if word == prevGuess {
-			continue
-		}
-		wordColourPattern := getColourPattern(word, answer)
-		// log.Printf("%s is %v", word, wordColourPattern)
-		wordCouldBeAnswer := reflect.DeepEqual(guessColourPattern, wordColourPattern)
-		if wordCouldBeAnswer {
-			// log.Printf("%s + %v could be %s", word, guessColourPattern, answer)
-			filteredWordList = append(filteredWordList, word)
-		}
-	}
-	return filteredWordList
-}
+func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 
-func getOptimalNextGuess(remainingWords []string) string {
+	guessDistributions := make(map[string]guessDistribution, len(remainingWords))
 
-	entropies := map[string]float64{}
-
-	// TODO - fix entropies calculation: I think it may be wrong
 	for _, potentialGuess := range remainingWords {
-
-		colourPatternNums := map[[wordLength]Colour]int{}
-
+		dist := guessDistribution{}
 		for _, potentialAnswer := range remainingWords {
 			colourPattern := getColourPattern(potentialGuess, potentialAnswer)
-			colourPatternNums[colourPattern]++
+			dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
 		}
-
-		numRemainingWords := len(remainingWords)
-		numBitsOfInfo := 0.0
-
-		for _, numWordsInPath := range colourPatternNums {
-			probability := float64(numWordsInPath) / float64(numRemainingWords)
-			numBitsOfInfo += float64(probability) * math.Log2(1.0/probability)
-		}
-		entropies[potentialGuess] = numBitsOfInfo
+		guessDistributions[potentialGuess] = dist
 	}
 
-	entropiesHighToLow := make([]guessEntropy, 0, len(entropies))
+	guessOutcomes := make([]guessOutcome, len(guessDistributions))
 
-	for guess, bits := range entropies {
-		entropiesHighToLow = append(entropiesHighToLow, guessEntropy{guess, bits})
+	// entropy calculations
+	for guess, dist := range guessDistributions {
+		outcome := guessOutcome{
+			guess:        guess,
+			distribution: dist,
+			entropyBits:  0.0,
+		}
+		for _, guesses := range dist {
+			prob := float64(len(guesses)) / float64(len(remainingWords))
+			outcome.entropyBits += float64(prob) * math.Log2(1.0/prob)
+		}
+		guessOutcomes = append(guessOutcomes, outcome)
 	}
 
-	sort.Slice(entropiesHighToLow, func(i, j int) bool { return entropiesHighToLow[i].Bits > entropiesHighToLow[j].Bits })
-
-	// TODO - remove
-	nextGuess := entropiesHighToLow[0].Guess
-	log.Printf("Next guess: %s (Top 10 pairs: %v)", nextGuess, entropiesHighToLow[:10])
-
-	entropiesLowToHigh := make([]guessEntropy, 0, len(entropies))
-	entropiesLowToHigh = append(entropiesLowToHigh, entropiesHighToLow...)
-	sort.Slice(entropiesLowToHigh, func(i, j int) bool { return entropiesLowToHigh[i].Bits < entropiesLowToHigh[j].Bits })
-	log.Printf("Bottom 10 pairs: %v", entropiesLowToHigh[:10])
-
-	return nextGuess
+	// sort
+	sort.Slice(guessOutcomes, func(i, j int) bool { return guessOutcomes[i].entropyBits > guessOutcomes[j].entropyBits })
+	return guessOutcomes
 }
 
 func playGame(answer string, wordList []string) error {
@@ -130,25 +111,24 @@ func playGame(answer string, wordList []string) error {
 	remainingWordList := make([]string, len(wordList))
 	copy(remainingWordList, wordList)
 
-	numGuesses := 0
 	gameWon := false
-
-	// -- gameWon = false
-	// -- get optimal next guess AND its resulting entropy distribution
+	numGuesses := 0
 
 	for numGuesses < maxNumGuesses {
 		numGuesses++
-		// -- get the colour pattern for the next guess
-		// -- if it is GGGGG, true gameWon = true and break
-		// -- if not, update the remaining word list to entropyDistribution[colourPattern]
+		nextOutcomes := getSortedGuessOutcomes(wordList)
+		for _, outcome := range nextOutcomes[:3] {
+			log.Println(outcome)
+		}
 
-		guess := getOptimalNextGuess(remainingWordList)
-		guessColourPattern := getColourPattern(guess, answer)
-		if reflect.DeepEqual(guessColourPattern, correctGuessColourPattern) {
+		// log.Printf("next outcomes: %s...", strings.Join(nextOutcomes[:3], ","))
+		nextOutcome := nextOutcomes[0]
+		nextColourPattern := getColourPattern(nextOutcome.guess, answer)
+		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
 			gameWon = true
 			break
 		}
-		remainingWordList = filterWordListBasedOnLatestGuess(remainingWordList, guessColourPattern, guess, answer)
+		remainingWordList = nextOutcome.distribution[nextColourPattern]
 		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
 	}
 
@@ -168,8 +148,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	log.Println(getOptimalNextGuess(wordList))
 
 	answer := "hello"
 	log.Printf("(The answer is: %q - shhhhhh!)", answer)
