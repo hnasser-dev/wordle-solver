@@ -84,7 +84,7 @@ func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 		guessDistributions[potentialGuess] = dist
 	}
 
-	guessOutcomes := make([]guessOutcome, len(guessDistributions))
+	guessOutcomes := make([]guessOutcome, 0, len(guessDistributions))
 	for guess, dist := range guessDistributions {
 		outcome := guessOutcome{
 			guess:        guess,
@@ -99,6 +99,7 @@ func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 	}
 
 	sort.Slice(guessOutcomes, func(i, j int) bool { return guessOutcomes[i].entropyBits > guessOutcomes[j].entropyBits })
+
 	return guessOutcomes
 }
 
@@ -112,30 +113,32 @@ func playGame(answer string, wordList []string) error {
 
 	for !gameWon && len(guesses) < maxNumGuesses {
 
-		nextOutcomes := getSortedGuessOutcomes(remainingWordList)
+		log.Printf("== guess #%d ==", len(guesses)+1)
+
+		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
+		bestOutcomes := getSortedGuessOutcomes(remainingWordList)
 
 		// just for logging
-		topN := int(math.Min(3, float64(len(nextOutcomes))))
+		topN := int(math.Min(3, float64(len(bestOutcomes))))
 		topNAsStr := make([]string, topN)
 		for i := range topN {
-			outcome := nextOutcomes[i]
+			outcome := bestOutcomes[i]
 			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
 		}
 		log.Printf("top %d next outcomes: %v", topN, strings.Join(topNAsStr, ","))
 
-		nextOutcome := nextOutcomes[0]
-		guesses = append(guesses, nextOutcome.guess)
-		log.Printf("guess #%d: '%s'", len(guesses), nextOutcome.guess)
+		bestOutcome := bestOutcomes[0]
+		guesses = append(guesses, bestOutcome.guess)
+		log.Printf("guessing word: %q", bestOutcome.guess)
 
-		nextColourPattern := getColourPattern(nextOutcome.guess, answer)
+		nextColourPattern := getColourPattern(bestOutcome.guess, answer)
 		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
 			gameWon = true
+			log.Printf("%q is the correct answer!", bestOutcome.guess)
 			break
 		}
 
-		remainingWordList = nextOutcome.distribution[nextColourPattern]
-		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
-		log.Println()
+		remainingWordList = bestOutcome.distribution[nextColourPattern]
 	}
 
 	log.Printf("guesses: %v", guesses)
