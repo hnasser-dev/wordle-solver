@@ -1,3 +1,3 @@
-module github.com/messy-coding/wordle-solver
+module github.com/hnasser-dev/wordle-solver
 
 go 1.23.1
