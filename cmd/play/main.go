@@ -72,7 +72,6 @@ func getColourPattern(guess string, answer string) colourPattern {
 func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 
 	guessDistributions := map[string]guessDistribution{}
-
 	for _, potentialGuess := range remainingWords {
 		dist := guessDistribution{}
 		for _, potentialAnswer := range remainingWords {
@@ -85,9 +84,7 @@ func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 		guessDistributions[potentialGuess] = dist
 	}
 
-	guessOutcomes := []guessOutcome{}
-
-	// entropy calculations
+	guessOutcomes := make([]guessOutcome, len(guessDistributions))
 	for guess, dist := range guessDistributions {
 		outcome := guessOutcome{
 			guess:        guess,
@@ -101,7 +98,6 @@ func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 		guessOutcomes = append(guessOutcomes, outcome)
 	}
 
-	// sort
 	sort.Slice(guessOutcomes, func(i, j int) bool { return guessOutcomes[i].entropyBits > guessOutcomes[j].entropyBits })
 	return guessOutcomes
 }
@@ -160,7 +156,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	answer := "eight"
+	answer := "hello"
 	log.Printf("(The answer is: %q - shhhhhh!)", answer)
 
 	if err := playGame(answer, wordList); err != nil {
