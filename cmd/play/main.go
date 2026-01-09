@@ -133,8 +133,15 @@ func playGame(answer string, wordList []string) error {
 	numGuesses := 0
 	gameWon := false
 
+	// -- gameWon = false
+	// -- get optimal next guess AND its resulting entropy distribution
+
 	for numGuesses < maxNumGuesses {
 		numGuesses++
+		// -- get the colour pattern for the next guess
+		// -- if it is GGGGG, true gameWon = true and break
+		// -- if not, update the remaining word list to entropyDistribution[colourPattern]
+
 		guess := getOptimalNextGuess(remainingWordList)
 		guessColourPattern := getColourPattern(guess, answer)
 		if reflect.DeepEqual(guessColourPattern, correctGuessColourPattern) {
