@@ -44,9 +44,9 @@ func PlayGame(answer string, wordList []string) ([]string, bool) {
 
 	for !gameWon && len(guesses) < maxNumGuesses {
 
-		slog.Debug("guess", "number", len(guesses)+1)
+		slog.Debug("guess", slog.Int("number", len(guesses)+1))
 
-		slog.Debug("len(remainingWordList)", "len", len(remainingWordList))
+		slog.Debug("len(remainingWordList)", slog.Int("len", len(remainingWordList)))
 		bestOutcomes := getSortedGuessOutcomes(remainingWordList)
 
 		// just for logging
@@ -56,16 +56,20 @@ func PlayGame(answer string, wordList []string) ([]string, bool) {
 			outcome := bestOutcomes[i]
 			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
 		}
-		slog.Debug("top next outcomes: %v", "topN", topN, "outcomes", strings.Join(topNAsStr, ","))
+		slog.Debug(
+			"top next outcomes: %v",
+			slog.Int("topN", topN),
+			slog.String("outcomes", strings.Join(topNAsStr, ",")),
+		)
 
 		bestOutcome := bestOutcomes[0]
 		guesses = append(guesses, bestOutcome.guess)
-		slog.Debug("performing next guess", "guess", bestOutcome.guess)
+		slog.Debug("performing next guess", slog.String("guess", bestOutcome.guess))
 
 		nextColourPattern := getColourPattern(bestOutcome.guess, answer)
 		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
 			gameWon = true
-			slog.Debug("correct answer", "answer", bestOutcome.guess)
+			slog.Debug("correct answer", slog.String("answer", bestOutcome.guess))
 			break
 		}
 
