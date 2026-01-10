@@ -2,7 +2,7 @@ package game
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 	"reflect"
 	"sort"
@@ -44,9 +44,9 @@ func PlayGame(answer string, wordList []string) ([]string, bool) {
 
 	for !gameWon && len(guesses) < maxNumGuesses {
 
-		log.Printf("== guess #%d ==", len(guesses)+1)
+		slog.Debug("guess", "number", len(guesses)+1)
 
-		log.Printf("len(remainingWordList)=%d", len(remainingWordList))
+		slog.Debug("len(remainingWordList)", "len", len(remainingWordList))
 		bestOutcomes := getSortedGuessOutcomes(remainingWordList)
 
 		// just for logging
@@ -56,28 +56,20 @@ func PlayGame(answer string, wordList []string) ([]string, bool) {
 			outcome := bestOutcomes[i]
 			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
 		}
-		log.Printf("top %d next outcomes: %v", topN, strings.Join(topNAsStr, ","))
+		slog.Debug("top next outcomes: %v", "topN", topN, "outcomes", strings.Join(topNAsStr, ","))
 
 		bestOutcome := bestOutcomes[0]
 		guesses = append(guesses, bestOutcome.guess)
-		log.Printf("guessing word: %q", bestOutcome.guess)
+		slog.Debug("performing next guess", "guess", bestOutcome.guess)
 
 		nextColourPattern := getColourPattern(bestOutcome.guess, answer)
 		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
 			gameWon = true
-			log.Printf("%q is the correct answer!", bestOutcome.guess)
+			slog.Debug("correct answer", "answer", bestOutcome.guess)
 			break
 		}
 
 		remainingWordList = bestOutcome.distribution[nextColourPattern]
-	}
-
-	log.Printf("guesses: %v", guesses)
-
-	if gameWon {
-		log.Printf("You won in %d guesses!", len(guesses))
-	} else {
-		log.Println("You lost!")
 	}
 
 	return guesses, gameWon

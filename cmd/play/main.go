@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 
+	"log/slog"
+
 	"github.com/hnasser-dev/wordle-solver/internal/game"
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
@@ -14,9 +16,7 @@ func main() {
 	}
 
 	answer := "hello"
-	log.Printf("(The answer is: %q - shhhhhh!)", answer)
+	slog.Debug("answer", "answer", answer)
 
-	if err := game.PlayGame(answer, wordList); err != nil {
-		log.Fatal(err)
-	}
+	game.PlayGame(answer, wordList)
 }
