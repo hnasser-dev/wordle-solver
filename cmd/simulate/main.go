@@ -4,6 +4,7 @@ import (
 	"log"
 	"log/slog"
 	"os"
+	"runtime"
 	"sync"
 
 	"github.com/hnasser-dev/wordle-solver/internal/game"
@@ -19,8 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to open log file %s - err: %s", logFilePath, err)
 	}
-	logger := slog.New(slog.NewJSONHandler(logFile, &slog.HandlerOptions{Level: slog.LevelInfo}))
-	slog.SetDefault(logger)
+	fileLogger := slog.New(slog.NewJSONHandler(logFile, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
 	wordList, err := words.GetWordList()
 	if err != nil {
@@ -28,14 +28,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	// simulate a game for all possible answers
+	// simulate a game for all possible answers - multiprocess and limit concurrency
 	var wg sync.WaitGroup
+	sem := make(chan struct{}, runtime.NumCPU())
+
 	for idx, answer := range wordList {
 		wg.Add(1)
+		sem <- struct{}{} // block until there is space in the sem
 		go func() {
 			defer wg.Done()
+			defer func() { <-sem }()
 			guesses, gameWon := game.PlayGame(answer, wordList)
-			slog.Info(
+			fileLogger.Info(
 				"game complete",
 				slog.Int("gameNum", idx+1),
 				slog.String("answer", answer),
@@ -44,5 +48,6 @@ func main() {
 			)
 		}()
 	}
+
 	wg.Wait()
 }
