@@ -49,7 +49,7 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap) 
 		slog.Debug("guess", slog.Int("number", len(guesses)+1))
 
 		slog.Debug("len(remainingWordList)", slog.Int("len", len(remainingWordList)))
-		bestOutcomes := getSortedGuessOutcomes(remainingWordList)
+		bestOutcomes := getSortedGuessOutcomes(remainingWordList, freqMap)
 
 		// just for logging
 		topN := int(math.Min(3, float64(len(bestOutcomes))))
@@ -59,7 +59,7 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap) 
 			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
 		}
 		slog.Debug(
-			"top next outcomes: %v",
+			"top next outcomes",
 			slog.Int("topN", topN),
 			slog.String("outcomes", strings.Join(topNAsStr, ",")),
 		)
@@ -115,7 +115,7 @@ func getColourPattern(guess string, answer string) colourPattern {
 	return colourPatternSlice
 }
 
-func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
+func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequencyMap) []guessOutcome {
 
 	guessDistributions := map[string]guessDistribution{}
 	for _, potentialGuess := range remainingWords {
@@ -144,7 +144,17 @@ func getSortedGuessOutcomes(remainingWords []string) []guessOutcome {
 		guessOutcomes = append(guessOutcomes, outcome)
 	}
 
-	sort.Slice(guessOutcomes, func(i, j int) bool { return guessOutcomes[i].entropyBits > guessOutcomes[j].entropyBits })
+	sort.Slice(
+		guessOutcomes,
+		func(i, j int) bool {
+			// if equal entropies, prioritise higher frequency
+			if guessOutcomes[i].entropyBits == guessOutcomes[j].entropyBits {
+				return freqMap[guessOutcomes[i].guess] > freqMap[guessOutcomes[j].guess]
+			} else {
+				return guessOutcomes[i].entropyBits > guessOutcomes[j].entropyBits
+			}
+		},
+	)
 
 	return guessOutcomes
 }
