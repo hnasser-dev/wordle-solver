@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+
+	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
 const wordLength int = 5
@@ -34,7 +36,7 @@ type guessOutcome struct {
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
 
 // Returns the guesses and whether the game was won
-func PlayGame(answer string, wordList []string) ([]string, bool) {
+func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap) ([]string, bool) {
 
 	remainingWordList := make([]string, len(wordList))
 	copy(remainingWordList, wordList)

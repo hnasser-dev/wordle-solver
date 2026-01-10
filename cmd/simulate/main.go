@@ -28,6 +28,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	freqMap, err := words.GetWordFrequencyMap()
+	if err != nil {
+		slog.Error("unable to read frequency map", "err", err)
+		os.Exit(1)
+	}
+
 	// simulate a game for all possible answers - multiprocess and limit concurrency
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, runtime.NumCPU())
@@ -38,7 +44,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 			defer func() { <-sem }()
-			guesses, gameWon := game.PlayGame(answer, wordList)
+			guesses, gameWon := game.PlayGame(answer, wordList, freqMap)
 			fileLogger.Info(
 				"game complete",
 				slog.Int("gameNum", idx+1),
