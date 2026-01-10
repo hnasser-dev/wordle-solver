@@ -44,6 +44,7 @@ func main() {
 				slog.Int("gameNum", idx+1),
 				slog.String("answer", answer),
 				slog.Int("numGuesses", len(guesses)),
+				slog.Any("guesses", guesses),
 				slog.Bool("gameWon", gameWon),
 			)
 		}()
