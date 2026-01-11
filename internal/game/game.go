@@ -34,9 +34,9 @@ type guessOutcome struct {
 }
 
 type gameState struct {
-	guesses               []string
-	bestRemainingOutcomes []guessOutcome
-	gameWon               bool
+	guesses                 []string
+	gameWon                 bool
+	sortedRemainingOutcomes []guessOutcome
 }
 
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
@@ -50,9 +50,9 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap, 
 	state := initialGameState
 	if state == nil {
 		state = &gameState{
-			guesses:               []string{},
-			gameWon:               false,
-			bestRemainingOutcomes: []guessOutcome{},
+			guesses:                 []string{},
+			gameWon:                 false,
+			sortedRemainingOutcomes: []guessOutcome{},
 		}
 	}
 
@@ -61,13 +61,13 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap, 
 		slog.Debug("guess", slog.Int("number", len(state.guesses)+1))
 
 		slog.Debug("len(remainingWordList)", slog.Int("len", len(remainingWordList)))
-		bestOutcomes := getSortedGuessOutcomes(remainingWordList, freqMap)
+		state.sortedRemainingOutcomes = getSortedGuessOutcomes(remainingWordList, freqMap)
 
 		// just for logging
-		topN := int(math.Min(3, float64(len(bestOutcomes))))
+		topN := int(math.Min(3, float64(len(state.sortedRemainingOutcomes))))
 		topNAsStr := make([]string, topN)
 		for i := range topN {
-			outcome := bestOutcomes[i]
+			outcome := state.sortedRemainingOutcomes[i]
 			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
 		}
 		slog.Debug(
@@ -76,7 +76,7 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap, 
 			slog.String("outcomes", strings.Join(topNAsStr, ",")),
 		)
 
-		bestOutcome := bestOutcomes[0]
+		bestOutcome := state.sortedRemainingOutcomes[0]
 		state.guesses = append(state.guesses, bestOutcome.guess)
 		slog.Debug("performing next guess", slog.String("guess", bestOutcome.guess))
 
