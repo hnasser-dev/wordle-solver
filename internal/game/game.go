@@ -34,9 +34,26 @@ type guessOutcome struct {
 }
 
 type gameState struct {
-	guesses                 []string
 	gameWon                 bool
+	guesses                 []string
 	sortedRemainingOutcomes []guessOutcome
+}
+
+func (g *gameState) DeepCopyOrNew() *gameState {
+	if g == nil {
+		return &gameState{}
+	}
+	c := *g
+	// deep copy non-primative fields
+	if g.guesses != nil {
+		c.guesses = make([]string, len(g.guesses))
+		copy(c.guesses, g.guesses)
+	}
+	if g.sortedRemainingOutcomes != nil {
+		c.sortedRemainingOutcomes = make([]guessOutcome, len(g.sortedRemainingOutcomes))
+		copy(c.sortedRemainingOutcomes, g.sortedRemainingOutcomes)
+	}
+	return &c
 }
 
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
@@ -47,14 +64,7 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap, 
 	remainingWordList := make([]string, len(wordList))
 	copy(remainingWordList, wordList)
 
-	state := initialGameState
-	if state == nil {
-		state = &gameState{
-			guesses:                 []string{},
-			gameWon:                 false,
-			sortedRemainingOutcomes: []guessOutcome{},
-		}
-	}
+	state := initialGameState.DeepCopyOrNew()
 
 	for !state.gameWon && len(state.guesses) < maxNumGuesses {
 
