@@ -29,7 +29,7 @@ func main() {
 	answer := "hello"
 	slog.Debug("answer", "answer", answer)
 
-	guesses, gameWon := game.PlayGame(answer, wordList, freqMap)
+	guesses, gameWon := game.PlayGame(answer, wordList, freqMap, nil)
 
 	slog.Info(
 		"game complete",

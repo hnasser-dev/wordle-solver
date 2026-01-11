@@ -33,20 +33,32 @@ type guessOutcome struct {
 	entropyBits  float64
 }
 
+type gameState struct {
+	guesses               []string
+	bestRemainingOutcomes []guessOutcome
+	gameWon               bool
+}
+
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
 
 // Returns the guesses and whether the game was won
-func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap) ([]string, bool) {
+func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap, initialGameState *gameState) ([]string, bool) {
 
 	remainingWordList := make([]string, len(wordList))
 	copy(remainingWordList, wordList)
 
-	guesses := []string{}
-	gameWon := false
+	state := initialGameState
+	if state == nil {
+		state = &gameState{
+			guesses:               []string{},
+			gameWon:               false,
+			bestRemainingOutcomes: []guessOutcome{},
+		}
+	}
 
-	for !gameWon && len(guesses) < maxNumGuesses {
+	for !state.gameWon && len(state.guesses) < maxNumGuesses {
 
-		slog.Debug("guess", slog.Int("number", len(guesses)+1))
+		slog.Debug("guess", slog.Int("number", len(state.guesses)+1))
 
 		slog.Debug("len(remainingWordList)", slog.Int("len", len(remainingWordList)))
 		bestOutcomes := getSortedGuessOutcomes(remainingWordList, freqMap)
@@ -65,12 +77,12 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap) 
 		)
 
 		bestOutcome := bestOutcomes[0]
-		guesses = append(guesses, bestOutcome.guess)
+		state.guesses = append(state.guesses, bestOutcome.guess)
 		slog.Debug("performing next guess", slog.String("guess", bestOutcome.guess))
 
 		nextColourPattern := getColourPattern(bestOutcome.guess, answer)
 		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
-			gameWon = true
+			state.gameWon = true
 			slog.Debug("correct answer", slog.String("answer", bestOutcome.guess))
 			break
 		}
@@ -78,7 +90,7 @@ func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap) 
 		remainingWordList = bestOutcome.distribution[nextColourPattern]
 	}
 
-	return guesses, gameWon
+	return state.guesses, state.gameWon
 }
 
 func getColourPattern(guess string, answer string) colourPattern {

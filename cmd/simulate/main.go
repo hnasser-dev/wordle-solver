@@ -44,7 +44,7 @@ func main() {
 		go func() {
 			defer wg.Done()
 			defer func() { <-sem }()
-			guesses, gameWon := game.PlayGame(answer, wordList, freqMap)
+			guesses, gameWon := game.PlayGame(answer, wordList, freqMap, nil)
 			fileLogger.Info(
 				"game complete",
 				slog.Int("gameNum", idx+1),
