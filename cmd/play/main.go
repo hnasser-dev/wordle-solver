@@ -14,6 +14,9 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	slog.SetDefault(logger)
 
+	initialGuesses := []string{"hello"}
+	game := game.NewGame(initialGuesses)
+
 	wordList, err := words.GetWordList()
 	if err != nil {
 		slog.Error("unable to read word list", "err", err)
