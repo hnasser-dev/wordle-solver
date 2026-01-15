@@ -6,7 +6,6 @@ import (
 	"log/slog"
 
 	"github.com/hnasser-dev/wordle-solver/internal/game"
-	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
 func main() {
@@ -14,25 +13,19 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
 	slog.SetDefault(logger)
 
-	initialGuesses := []string{"hello"}
-	game := game.NewGame(initialGuesses)
-
-	wordList, err := words.GetWordList()
-	if err != nil {
-		slog.Error("unable to read word list", "err", err)
-		os.Exit(1)
-	}
-
-	freqMap, err := words.GetWordFrequencyMap()
-	if err != nil {
-		slog.Error("unable to read frequency map", "err", err)
-		os.Exit(1)
-	}
-
 	answer := "hello"
 	slog.Debug("answer", "answer", answer)
 
-	guesses, gameWon := game.PlayGame(answer, wordList, freqMap, nil)
+	// initialGuesses := []string{"hello"}
+	// game, err := game.NewGame(answer, initialGuesses...)
+
+	game, err := game.NewGame(answer)
+	if err != nil {
+		slog.Error("unable to create new game", "err", err)
+		os.Exit(1)
+	}
+
+	gameWon, guesses := game.PlayGameUntilEnd(true)
 
 	slog.Info(
 		"game complete",
