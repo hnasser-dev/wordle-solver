@@ -48,15 +48,13 @@ func NewGame(answer string, initialGuesses ...string) (*Game, error) {
 // Returns: gameWon (bool)
 func (g *Game) PerformGuess(guess string) bool {
 	g.Guesses = append(g.Guesses, guess)
-	nextColourPattern := getColourPattern(guess, g.Answer)
-	if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
+	guessDistribution := computeGuessDistribution(guess, g.RemainingWordList)
+	colourPattern := getColourPattern(guess, g.Answer)
+	if reflect.DeepEqual(colourPattern, correctGuessColourPattern) {
 		g.GameWon = true
 	}
-	// TODO - create a function that returns guess outcomes as a (unsorted) map
-	// THEN UPDATE THE BELOW FUNCTION CALL
-	// And then index into the map like: g.RemainingWordList = g.SortedRemainingOutcomes[guess].distribution[nextColourGuess]
+	g.RemainingWordList = guessDistribution[colourPattern]
 	g.SortedRemainingOutcomes = getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
-	g.RemainingWordList = 
 	return g.GameWon
 }
 
@@ -80,4 +78,16 @@ func (g *Game) PlayGameUntilEnd(limitGuesses bool) {
 		}
 		g.PerformOptimalGuess()
 	}
+}
+
+func computeGuessDistribution(guess string, wordList []string) guessDistribution {
+	dist := guessDistribution{}
+	for _, potentialAnswer := range wordList {
+		if potentialAnswer == guess {
+			continue
+		}
+		colourPattern := getColourPattern(potentialAnswer, potentialAnswer)
+		dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
+	}
+	return dist
 }
