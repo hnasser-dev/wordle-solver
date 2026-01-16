@@ -84,7 +84,7 @@ func NewGame(answer string, initialGuesses ...string) (*Game, error) {
 
 func (g *Game) PerformGuess(guess string) bool {
 	slog.Debug("performing provided guess", slog.String("guess", guess))
-	guessIsCorrect, remainingWordList := computeGuess(guess, g.Answer, g.RemainingWordList)
+	guessIsCorrect, remainingWordList := executeGuess(guess, g.Answer, g.RemainingWordList)
 	g.Guesses = append(g.Guesses, guess)
 	g.RemainingWordList = remainingWordList
 	g.GameWon = guessIsCorrect || g.GameWon
@@ -95,7 +95,7 @@ func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
 	optimalGuess := sortedRemainingOutcomes[0].guess
 	slog.Debug("performing optimal guess", "guess", optimalGuess)
-	guessIsCorrect, remainingWordList := computeGuess(optimalGuess, g.Answer, g.RemainingWordList)
+	guessIsCorrect, remainingWordList := executeGuess(optimalGuess, g.Answer, g.RemainingWordList)
 	g.Guesses = append(g.Guesses, optimalGuess)
 	g.RemainingWordList = remainingWordList
 	g.GameWon = guessIsCorrect || g.GameWon
@@ -196,7 +196,7 @@ func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequency
 }
 
 // Internal helper function that applies the guess (mutates Game)
-func computeGuess(guess string, answer string, remainingWords []string) (bool, []string) {
+func executeGuess(guess string, answer string, remainingWords []string) (bool, []string) {
 	guessIsCorrect := false
 	guessDistribution := computeGuessDistribution(guess, remainingWords)
 	colourPattern := getColourPattern(guess, answer)
