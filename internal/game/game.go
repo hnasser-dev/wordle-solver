@@ -82,28 +82,24 @@ func NewGame(answer string, initialGuesses ...string) (*Game, error) {
 	return &game, nil
 }
 
-// Internal helper function that applies the guess (mutates Game)
-func (g *Game) applyGuess(guess string) bool {
-	g.Guesses = append(g.Guesses, guess)
-	guessDistribution := computeGuessDistribution(guess, g.RemainingWordList)
-	colourPattern := getColourPattern(guess, g.Answer)
-	if reflect.DeepEqual(colourPattern, correctGuessColourPattern) {
-		g.GameWon = true
-	}
-	g.RemainingWordList = guessDistribution[colourPattern]
-	return g.GameWon
-}
-
 func (g *Game) PerformGuess(guess string) bool {
 	slog.Debug("performing provided guess", slog.String("guess", guess))
-	return g.applyGuess(guess)
+	guessIsCorrect, remainingWordList := computeGuess(guess, g.Answer, g.RemainingWordList)
+	g.Guesses = append(g.Guesses, guess)
+	g.RemainingWordList = remainingWordList
+	g.GameWon = guessIsCorrect || g.GameWon
+	return g.GameWon
 }
 
 func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
 	optimalGuess := sortedRemainingOutcomes[0].guess
 	slog.Debug("performing optimal guess", "guess", optimalGuess)
-	return g.applyGuess(optimalGuess)
+	guessIsCorrect, remainingWordList := computeGuess(optimalGuess, g.Answer, g.RemainingWordList)
+	g.Guesses = append(g.Guesses, optimalGuess)
+	g.RemainingWordList = remainingWordList
+	g.GameWon = guessIsCorrect || g.GameWon
+	return g.GameWon
 }
 
 func (g *Game) PlayGameUntilEnd(limitGuesses bool) (bool, []string) {
@@ -197,4 +193,16 @@ func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequency
 	)
 
 	return guessOutcomes
+}
+
+// Internal helper function that applies the guess (mutates Game)
+func computeGuess(guess string, answer string, remainingWords []string) (bool, []string) {
+	guessIsCorrect := false
+	guessDistribution := computeGuessDistribution(guess, remainingWords)
+	colourPattern := getColourPattern(guess, answer)
+	if reflect.DeepEqual(colourPattern, correctGuessColourPattern) {
+		guessIsCorrect = true
+	}
+	resultngWordList := guessDistribution[colourPattern]
+	return guessIsCorrect, resultngWordList
 }
