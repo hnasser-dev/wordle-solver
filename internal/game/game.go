@@ -44,9 +44,10 @@ type Game struct {
 	RemainingWordList       []string
 	SortedRemainingOutcomes []guessOutcome
 	WordFrequencies         words.WordFrequencyMap
+	DumbMode                bool
 }
 
-func NewGame(answer string, initialGuesses ...string) (*Game, error) {
+func NewGame(answer string, dumbMode bool, initialGuesses ...string) (*Game, error) {
 
 	initialWordList, err := words.GetWordList()
 	if err != nil {
@@ -73,6 +74,7 @@ func NewGame(answer string, initialGuesses ...string) (*Game, error) {
 		RemainingWordList:       remainingWordList,
 		SortedRemainingOutcomes: []guessOutcome{},
 		WordFrequencies:         freqMap,
+		DumbMode:                dumbMode,
 	}
 
 	for _, guess := range initialGuesses {
@@ -93,10 +95,16 @@ func (g *Game) PerformGuess(guess string) bool {
 
 func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
-	optimalGuess := sortedRemainingOutcomes[0].guess
-	slog.Debug("performing optimal guess", "guess", optimalGuess)
-	guessIsCorrect, remainingWordList := executeGuess(optimalGuess, g.Answer, g.RemainingWordList)
-	g.Guesses = append(g.Guesses, optimalGuess)
+	var guess string
+	if g.DumbMode {
+		guess = sortedRemainingOutcomes[len(sortedRemainingOutcomes)-1].guess
+		slog.Debug("performing least optimal guess", "guess", guess)
+	} else {
+		guess = sortedRemainingOutcomes[0].guess
+		slog.Debug("performing optimal guess", "guess", guess)
+	}
+	guessIsCorrect, remainingWordList := executeGuess(guess, g.Answer, g.RemainingWordList)
+	g.Guesses = append(g.Guesses, guess)
 	g.RemainingWordList = remainingWordList
 	g.GameWon = guessIsCorrect || g.GameWon
 	return g.GameWon
