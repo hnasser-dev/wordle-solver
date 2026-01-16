@@ -2,6 +2,7 @@ package game
 
 import (
 	"fmt"
+	"log/slog"
 	"math"
 	"reflect"
 	"sort"
@@ -79,6 +80,7 @@ func NewGame(answer string, initialGuesses ...string) (*Game, error) {
 
 // Returns: gameWon (bool)
 func (g *Game) PerformGuess(guess string) bool {
+	slog.Info("performing guess", slog.String("guess", guess))
 	g.Guesses = append(g.Guesses, guess)
 	guessDistribution := computeGuessDistribution(guess, g.RemainingWordList)
 	colourPattern := getColourPattern(guess, g.Answer)
@@ -86,19 +88,14 @@ func (g *Game) PerformGuess(guess string) bool {
 		g.GameWon = true
 	}
 	g.RemainingWordList = guessDistribution[colourPattern]
-	g.SortedRemainingOutcomes = getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
 	return g.GameWon
 }
 
 // Returns: gameWon (bool)
 func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
-	bestOutcome := sortedRemainingOutcomes[0]
-	g.Guesses = append(g.Guesses, bestOutcome.guess)
-	nextColourPattern := getColourPattern(bestOutcome.guess, g.Answer)
-	if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
-		g.GameWon = true
-	}
+	bestGuess := sortedRemainingOutcomes[0].guess
+	g.PerformGuess(bestGuess)
 	return g.GameWon
 }
 
@@ -153,7 +150,7 @@ func computeGuessDistribution(guess string, wordList []string) guessDistribution
 		if potentialAnswer == guess {
 			continue
 		}
-		colourPattern := getColourPattern(potentialAnswer, potentialAnswer)
+		colourPattern := getColourPattern(guess, potentialAnswer)
 		dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
 	}
 	return dist
