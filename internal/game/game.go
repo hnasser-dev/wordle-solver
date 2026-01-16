@@ -75,12 +75,15 @@ func NewGame(answer string, initialGuesses ...string) (*Game, error) {
 		WordFrequencies:         freqMap,
 	}
 
+	for _, guess := range initialGuesses {
+		game.PerformGuess(guess)
+	}
+
 	return &game, nil
 }
 
-// Returns: gameWon (bool)
-func (g *Game) PerformGuess(guess string) bool {
-	slog.Info("performing guess", slog.String("guess", guess))
+// Internal helper function that applies the guess (mutates Game)
+func (g *Game) applyGuess(guess string) bool {
 	g.Guesses = append(g.Guesses, guess)
 	guessDistribution := computeGuessDistribution(guess, g.RemainingWordList)
 	colourPattern := getColourPattern(guess, g.Answer)
@@ -91,12 +94,16 @@ func (g *Game) PerformGuess(guess string) bool {
 	return g.GameWon
 }
 
-// Returns: gameWon (bool)
+func (g *Game) PerformGuess(guess string) bool {
+	slog.Debug("performing provided guess", slog.String("guess", guess))
+	return g.applyGuess(guess)
+}
+
 func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
-	bestGuess := sortedRemainingOutcomes[0].guess
-	g.PerformGuess(bestGuess)
-	return g.GameWon
+	optimalGuess := sortedRemainingOutcomes[0].guess
+	slog.Debug("performing optimal guess", "guess", optimalGuess)
+	return g.applyGuess(optimalGuess)
 }
 
 func (g *Game) PlayGameUntilEnd(limitGuesses bool) (bool, []string) {
@@ -115,7 +122,7 @@ func getColourPattern(guess string, answer string) colourPattern {
 	colourPatternSlice := [wordLength]colour{Grey, Grey, Grey, Grey, Grey}
 
 	numCharsInAnswer := map[byte]int{}
-	for i := 0; i < len(answer); i++ {
+	for i := range len(answer) {
 		numCharsInAnswer[answer[i]]++
 	}
 

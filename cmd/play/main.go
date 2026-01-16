@@ -16,10 +16,8 @@ func main() {
 	answer := "hello"
 	slog.Debug("answer", "answer", answer)
 
-	// initialGuesses := []string{"hello"}
-	// game, err := game.NewGame(answer, initialGuesses...)
-
-	game, err := game.NewGame(answer)
+	initialGuesses := []string{"chasm", "slate"}
+	game, err := game.NewGame(answer, initialGuesses...)
 	if err != nil {
 		slog.Error("unable to create new game", "err", err)
 		os.Exit(1)
