@@ -16,10 +16,10 @@ func main() {
 	answer := "hello"
 	slog.Debug("answer", "answer", answer)
 
-	dumbMode := true // performs the least optimal guesses
+	mode := game.NormalMode
 	initialGuesses := []string{}
 
-	game, err := game.NewGame(answer, dumbMode, initialGuesses...)
+	game, err := game.NewGame(answer, mode, initialGuesses...)
 	if err != nil {
 		slog.Error("unable to create new game", "err", err)
 		os.Exit(1)

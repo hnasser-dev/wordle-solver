@@ -22,7 +22,14 @@ const (
 	Green
 )
 
+const (
+	NormalMode gameMode = iota
+	Dumb
+)
+
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
+
+type gameMode uint8
 
 type colour uint8
 
@@ -44,10 +51,10 @@ type Game struct {
 	RemainingWordList       []string
 	SortedRemainingOutcomes []guessOutcome
 	WordFrequencies         words.WordFrequencyMap
-	DumbMode                bool
+	GameMode                gameMode
 }
 
-func NewGame(answer string, dumbMode bool, initialGuesses ...string) (*Game, error) {
+func NewGame(answer string, mode gameMode, initialGuesses ...string) (*Game, error) {
 
 	initialWordList, err := words.GetWordList()
 	if err != nil {
@@ -74,7 +81,7 @@ func NewGame(answer string, dumbMode bool, initialGuesses ...string) (*Game, err
 		RemainingWordList:       remainingWordList,
 		SortedRemainingOutcomes: []guessOutcome{},
 		WordFrequencies:         freqMap,
-		DumbMode:                dumbMode,
+		GameMode:                mode,
 	}
 
 	for _, guess := range initialGuesses {
@@ -96,12 +103,15 @@ func (g *Game) PerformGuess(guess string) bool {
 func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
 	var guess string
-	if g.DumbMode {
+	switch g.GameMode {
+	case Dumb:
 		guess = sortedRemainingOutcomes[len(sortedRemainingOutcomes)-1].guess
 		slog.Debug("performing least optimal guess", "guess", guess)
-	} else {
+	case NormalMode:
 		guess = sortedRemainingOutcomes[0].guess
 		slog.Debug("performing optimal guess", "guess", guess)
+	default:
+		panic(fmt.Sprintf("unknwon gameMode: %d", g.GameMode))
 	}
 	guessIsCorrect, remainingWordList := executeGuess(guess, g.Answer, g.RemainingWordList)
 	g.Guesses = append(g.Guesses, guess)
