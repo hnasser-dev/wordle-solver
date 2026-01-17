@@ -12,9 +12,10 @@ import (
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
-const wordLength int = 5
-
-const maxNumGuesses int = 6
+const (
+	wordLength    = 5
+	maxNumGuesses = 6
+)
 
 const (
 	Grey colour = iota
@@ -24,23 +25,38 @@ const (
 
 const (
 	NormalMode gameMode = iota
-	Dumb
+	DumbMode
 )
 
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
 
 type gameMode uint8
 
+func (m gameMode) Valid() bool {
+	switch m {
+	case NormalMode, DumbMode:
+		return true
+	default:
+		return false
+	}
+}
+
 type colour uint8
-
 type colourPattern [wordLength]colour
-
 type guessDistribution map[colourPattern][]string
 
 type guessOutcome struct {
 	guess        string
 	distribution guessDistribution
 	entropyBits  float64
+}
+
+type GameConfig struct {
+	Answer   string
+	GameMode gameMode
+
+	InitialGuesses []string
+	WordList       []string
 }
 
 type Game struct {
@@ -54,18 +70,34 @@ type Game struct {
 	GameMode                gameMode
 }
 
-func NewGame(answer string, mode gameMode, initialGuesses ...string) (*Game, error) {
+func NewGame(config GameConfig) (*Game, error) {
 
-	initialWordList, err := words.GetWordList()
-	if err != nil {
-		return nil, fmt.Errorf("unable to read word list - err: %w", err)
+	var err error
+
+	if config.Answer == "" {
+		return nil, fmt.Errorf("answer is required")
 	}
-	remainingWordList := make([]string, len(initialWordList))
-	copy(remainingWordList, initialWordList)
 
-	answerInWordList := slices.Contains(initialWordList, answer)
+	if !config.GameMode.Valid() {
+		return nil, fmt.Errorf("GameMode not required or is invalid")
+	}
+
+	var initialWordList []string
+
+	if config.WordList == nil {
+		initialWordList, err = words.GetWordList()
+		if err != nil {
+			return nil, fmt.Errorf("unable to read word list - err: %w", err)
+		}
+	} else {
+		initialWordList = append([]string{}, config.WordList...) // copy
+	}
+
+	remainingWordList := append([]string{}, initialWordList...) // copy
+
+	answerInWordList := slices.Contains(initialWordList, config.Answer)
 	if !answerInWordList {
-		return nil, fmt.Errorf("provided answer %q is not in the word list", answer)
+		return nil, fmt.Errorf("provided answer %q is not in the word list", config.Answer)
 	}
 
 	freqMap, err := words.GetWordFrequencyMap()
@@ -74,17 +106,17 @@ func NewGame(answer string, mode gameMode, initialGuesses ...string) (*Game, err
 	}
 
 	game := Game{
-		Answer:                  answer,
+		Answer:                  config.Answer,
 		GameWon:                 false,
 		Guesses:                 []string{},
 		InitialWordList:         initialWordList,
 		RemainingWordList:       remainingWordList,
 		SortedRemainingOutcomes: []guessOutcome{},
 		WordFrequencies:         freqMap,
-		GameMode:                mode,
+		GameMode:                config.GameMode,
 	}
 
-	for _, guess := range initialGuesses {
+	for _, guess := range config.InitialGuesses {
 		game.PerformGuess(guess)
 	}
 
@@ -104,7 +136,7 @@ func (g *Game) PerformOptimalGuess() bool {
 	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
 	var guess string
 	switch g.GameMode {
-	case Dumb:
+	case DumbMode:
 		guess = sortedRemainingOutcomes[len(sortedRemainingOutcomes)-1].guess
 		slog.Debug("performing least optimal guess", "guess", guess)
 	case NormalMode:
