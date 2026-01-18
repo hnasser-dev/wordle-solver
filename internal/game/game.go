@@ -6,14 +6,16 @@ import (
 	"math"
 	"reflect"
 	"sort"
-	"strings"
+
+	"slices"
 
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
-const wordLength int = 5
-
-const maxNumGuesses int = 6
+const (
+	wordLength    = 5
+	maxNumGuesses = 6
+)
 
 const (
 	Grey colour = iota
@@ -21,10 +23,26 @@ const (
 	Green
 )
 
+const (
+	NormalMode gameMode = iota
+	DumbMode
+)
+
+var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
+
+type gameMode uint8
+
+func (m gameMode) Valid() bool {
+	switch m {
+	case NormalMode, DumbMode:
+		return true
+	default:
+		return false
+	}
+}
+
 type colour uint8
-
 type colourPattern [wordLength]colour
-
 type guessDistribution map[colourPattern][]string
 
 type guessOutcome struct {
@@ -33,74 +51,116 @@ type guessOutcome struct {
 	entropyBits  float64
 }
 
-type gameState struct {
-	gameWon                 bool
-	guesses                 []string
-	sortedRemainingOutcomes []guessOutcome
+type GameConfig struct {
+	Answer   string
+	GameMode gameMode
+
+	InitialGuesses []string
+	WordList       []string
 }
 
-func (g *gameState) DeepCopyOrNew() *gameState {
-	if g == nil {
-		return &gameState{}
-	}
-	c := *g
-	// deep copy non-primative fields
-	if g.guesses != nil {
-		c.guesses = make([]string, len(g.guesses))
-		copy(c.guesses, g.guesses)
-	}
-	if g.sortedRemainingOutcomes != nil {
-		c.sortedRemainingOutcomes = make([]guessOutcome, len(g.sortedRemainingOutcomes))
-		copy(c.sortedRemainingOutcomes, g.sortedRemainingOutcomes)
-	}
-	return &c
+type Game struct {
+	Answer                  string
+	GameWon                 bool
+	Guesses                 []string
+	InitialWordList         []string
+	RemainingWordList       []string
+	SortedRemainingOutcomes []guessOutcome
+	WordFrequencies         words.WordFrequencyMap
+	GameMode                gameMode
 }
 
-var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
+func NewGame(config GameConfig) (*Game, error) {
 
-// Returns the guesses and whether the game was won
-func PlayGame(answer string, wordList []string, freqMap words.WordFrequencyMap, initialGameState *gameState) ([]string, bool) {
+	var err error
 
-	remainingWordList := make([]string, len(wordList))
-	copy(remainingWordList, wordList)
+	if config.Answer == "" {
+		return nil, fmt.Errorf("answer is required")
+	}
 
-	state := initialGameState.DeepCopyOrNew()
+	if !config.GameMode.Valid() {
+		return nil, fmt.Errorf("GameMode not required or is invalid")
+	}
 
-	for !state.gameWon && len(state.guesses) < maxNumGuesses {
+	var initialWordList []string
 
-		slog.Debug("guess", slog.Int("number", len(state.guesses)+1))
-
-		slog.Debug("len(remainingWordList)", slog.Int("len", len(remainingWordList)))
-		state.sortedRemainingOutcomes = getSortedGuessOutcomes(remainingWordList, freqMap)
-
-		// just for logging
-		topN := int(math.Min(3, float64(len(state.sortedRemainingOutcomes))))
-		topNAsStr := make([]string, topN)
-		for i := range topN {
-			outcome := state.sortedRemainingOutcomes[i]
-			topNAsStr[i] = fmt.Sprintf("guessOutcome(guess=%s, entropyBits=%f)", outcome.guess, outcome.entropyBits)
+	if config.WordList == nil {
+		initialWordList, err = words.GetWordList()
+		if err != nil {
+			return nil, fmt.Errorf("unable to read word list - err: %w", err)
 		}
-		slog.Debug(
-			"top next outcomes",
-			slog.Int("topN", topN),
-			slog.String("outcomes", strings.Join(topNAsStr, ",")),
-		)
+	} else {
+		initialWordList = append([]string{}, config.WordList...) // copy
+	}
 
-		bestOutcome := state.sortedRemainingOutcomes[0]
-		state.guesses = append(state.guesses, bestOutcome.guess)
-		slog.Debug("performing next guess", slog.String("guess", bestOutcome.guess))
+	remainingWordList := append([]string{}, initialWordList...) // copy
 
-		nextColourPattern := getColourPattern(bestOutcome.guess, answer)
-		if reflect.DeepEqual(nextColourPattern, correctGuessColourPattern) {
-			state.gameWon = true
-			slog.Debug("correct answer", slog.String("answer", bestOutcome.guess))
+	answerInWordList := slices.Contains(initialWordList, config.Answer)
+	if !answerInWordList {
+		return nil, fmt.Errorf("provided answer %q is not in the word list", config.Answer)
+	}
+
+	freqMap, err := words.GetWordFrequencyMap()
+	if err != nil {
+		return nil, fmt.Errorf("unable to read frequency map - err: %w", err)
+	}
+
+	game := Game{
+		Answer:                  config.Answer,
+		GameWon:                 false,
+		Guesses:                 []string{},
+		InitialWordList:         initialWordList,
+		RemainingWordList:       remainingWordList,
+		SortedRemainingOutcomes: []guessOutcome{},
+		WordFrequencies:         freqMap,
+		GameMode:                config.GameMode,
+	}
+
+	for _, guess := range config.InitialGuesses {
+		game.PerformGuess(guess)
+	}
+
+	return &game, nil
+}
+
+func (g *Game) PerformGuess(guess string) bool {
+	slog.Debug("performing provided guess", slog.String("guess", guess))
+	guessIsCorrect, remainingWordList := executeGuess(guess, g.Answer, g.RemainingWordList)
+	g.Guesses = append(g.Guesses, guess)
+	g.RemainingWordList = remainingWordList
+	g.GameWon = guessIsCorrect || g.GameWon
+	return g.GameWon
+}
+
+func (g *Game) PerformOptimalGuess() bool {
+	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.WordFrequencies)
+	var guess string
+	switch g.GameMode {
+	case DumbMode:
+		guess = sortedRemainingOutcomes[len(sortedRemainingOutcomes)-1].guess
+		slog.Debug("performing least optimal guess", "guess", guess)
+	case NormalMode:
+		guess = sortedRemainingOutcomes[0].guess
+		slog.Debug("performing optimal guess", "guess", guess)
+	default:
+		panic(fmt.Sprintf("unknwon gameMode: %d", g.GameMode))
+	}
+	guessIsCorrect, remainingWordList := executeGuess(guess, g.Answer, g.RemainingWordList)
+	g.Guesses = append(g.Guesses, guess)
+	g.RemainingWordList = remainingWordList
+	g.GameWon = guessIsCorrect || g.GameWon
+	return g.GameWon
+}
+
+func (g *Game) PlayGameUntilEnd(limitGuesses bool) (bool, []string) {
+	// play the game until complete
+	for !g.GameWon {
+		if limitGuesses && len(g.Guesses) == maxNumGuesses {
 			break
 		}
-
-		remainingWordList = bestOutcome.distribution[nextColourPattern]
+		g.PerformOptimalGuess()
 	}
-
-	return state.guesses, state.gameWon
+	return g.GameWon, g.Guesses
 }
 
 func getColourPattern(guess string, answer string) colourPattern {
@@ -108,7 +168,7 @@ func getColourPattern(guess string, answer string) colourPattern {
 	colourPatternSlice := [wordLength]colour{Grey, Grey, Grey, Grey, Grey}
 
 	numCharsInAnswer := map[byte]int{}
-	for i := 0; i < len(answer); i++ {
+	for i := range len(answer) {
 		numCharsInAnswer[answer[i]]++
 	}
 
@@ -137,19 +197,23 @@ func getColourPattern(guess string, answer string) colourPattern {
 	return colourPatternSlice
 }
 
+func computeGuessDistribution(guess string, wordList []string) guessDistribution {
+	dist := guessDistribution{}
+	for _, potentialAnswer := range wordList {
+		if potentialAnswer == guess {
+			continue
+		}
+		colourPattern := getColourPattern(guess, potentialAnswer)
+		dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
+	}
+	return dist
+}
+
 func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequencyMap) []guessOutcome {
 
 	guessDistributions := map[string]guessDistribution{}
 	for _, potentialGuess := range remainingWords {
-		dist := guessDistribution{}
-		for _, potentialAnswer := range remainingWords {
-			if potentialAnswer == potentialGuess {
-				continue // prevent infinite loop of guesses
-			}
-			colourPattern := getColourPattern(potentialGuess, potentialAnswer)
-			dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
-		}
-		guessDistributions[potentialGuess] = dist
+		guessDistributions[potentialGuess] = computeGuessDistribution(potentialGuess, remainingWords)
 	}
 
 	guessOutcomes := make([]guessOutcome, 0, len(guessDistributions))
@@ -179,4 +243,16 @@ func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequency
 	)
 
 	return guessOutcomes
+}
+
+// Internal helper function that applies the guess (mutates Game)
+func executeGuess(guess string, answer string, remainingWords []string) (bool, []string) {
+	guessIsCorrect := false
+	guessDistribution := computeGuessDistribution(guess, remainingWords)
+	colourPattern := getColourPattern(guess, answer)
+	if reflect.DeepEqual(colourPattern, correctGuessColourPattern) {
+		guessIsCorrect = true
+	}
+	resultngWordList := guessDistribution[colourPattern]
+	return guessIsCorrect, resultngWordList
 }
