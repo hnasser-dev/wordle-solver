@@ -24,15 +24,15 @@ const (
 )
 
 const (
-	NormalMode gameMode = iota
+	NormalMode GameMode = iota
 	DumbMode
 )
 
 var correctGuessColourPattern = colourPattern{Green, Green, Green, Green, Green}
 
-type gameMode uint8
+type GameMode uint8
 
-func (m gameMode) Valid() bool {
+func (m GameMode) Valid() bool {
 	switch m {
 	case NormalMode, DumbMode:
 		return true
@@ -53,7 +53,7 @@ type guessOutcome struct {
 
 type GameConfig struct {
 	Answer   string
-	GameMode gameMode
+	GameMode GameMode
 
 	InitialGuesses []string
 	WordList       []string
@@ -67,7 +67,7 @@ type Game struct {
 	RemainingWordList       []string
 	SortedRemainingOutcomes []guessOutcome
 	WordFrequencies         words.WordFrequencyMap
-	GameMode                gameMode
+	GameMode                GameMode
 }
 
 func NewGame(config GameConfig) (*Game, error) {
