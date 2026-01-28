@@ -45,6 +45,7 @@ func getAnswerFromApi() (string, error) {
 	return data.Solution, nil
 }
 
+// solveWordle(mode, initialGuesses...) -> {gameWon bool, guesses []string}
 func solveWordle(this js.Value, args []js.Value) interface{} {
 	gameModeStr := args[0]
 	var gameMode game.GameMode
