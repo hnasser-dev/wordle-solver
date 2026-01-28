@@ -3,3 +3,4 @@
 !.gitkeep
 *.log
 tmp
+*_templ.go
