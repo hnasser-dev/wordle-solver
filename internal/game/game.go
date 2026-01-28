@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"log/slog"
+	"maps"
 	"math"
 	"reflect"
 	"sort"
@@ -86,10 +87,7 @@ func NewGame(config GameConfig) (*Game, error) {
 	var initialWordList []string
 
 	if config.WordList == nil {
-		initialWordList, err = words.GetWordList()
-		if err != nil {
-			return nil, fmt.Errorf("unable to read word list - err: %w", err)
-		}
+		initialWordList = words.GetWordList()
 	} else {
 		initialWordList = append([]string{}, config.WordList...) // copy
 	}
@@ -104,10 +102,7 @@ func NewGame(config GameConfig) (*Game, error) {
 			return nil, fmt.Errorf("unable to read frequency map - err: %w", err)
 		}
 	} else {
-		// copy
-		for k, v := range config.FreqMap {
-			freqMap[k] = v
-		}
+		maps.Copy(freqMap, config.FreqMap)
 	}
 
 	answerInWordList := slices.Contains(initialWordList, config.Answer)

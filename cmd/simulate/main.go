@@ -33,11 +33,7 @@ func main() {
 	}
 	fileLogger := slog.New(slog.NewJSONHandler(logFile, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	wordList, err := words.GetWordList()
-	if err != nil {
-		slog.Error("unable to read word list", "err", err)
-		os.Exit(1)
-	}
+	wordList := words.GetWordList()
 
 	freq, err := words.GetWordFrequencyMap()
 	if err != nil {

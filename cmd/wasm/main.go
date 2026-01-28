@@ -65,7 +65,7 @@ func solveWordle(this js.Value, args []js.Value) interface{} {
 	}
 	answer, err := getAnswerFromApi()
 	if err != nil {
-		return js.ValueOf(fmt.Sprintf("error: unable to retrieve answer from API - err: %s", err.Error()))
+		return js.ValueOf(fmt.Sprintf("error: unable to retrieve answer from API - err: %s", err))
 	}
 	game, err := game.NewGame(
 		game.GameConfig{
@@ -86,7 +86,11 @@ func solveWordle(this js.Value, args []js.Value) interface{} {
 }
 
 func main() {
-	wordList, _ = words.GetWordList()
-	freqMap, _ = words.GetWordFrequencyMap()
+	var err error
+	wordList = words.GetWordList()
+	freqMap, err = words.GetWordFrequencyMap()
+	if err != nil {
+		js.Global().Set("freqMapError", js.ValueOf(fmt.Sprintf("unable to fetch word frequency map - err: %s", err)))
+	}
 	js.Global().Set("solveWordle", js.FuncOf(solveWordle))
 }
