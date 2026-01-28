@@ -39,6 +39,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	freq, err := words.GetWordFrequencyMap()
+	if err != nil {
+		slog.Error("unable to read frequency map list", "err", err)
+		os.Exit(1)
+	}
+
 	// independent subset of list
 	startingGuessesList := append([]string{}, wordList[:8]...)
 
@@ -66,6 +72,7 @@ func main() {
 					GameMode:       game.NormalMode,
 					InitialGuesses: initialGuesses,
 					WordList:       wordList,
+					FreqMap:        freq,
 				})
 				if err != nil {
 					slog.Error("unable to create new game", "err", err)

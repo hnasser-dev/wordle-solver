@@ -57,6 +57,7 @@ type GameConfig struct {
 
 	InitialGuesses []string
 	WordList       []string
+	FreqMap        words.WordFrequencyMap
 }
 
 type Game struct {
@@ -95,14 +96,23 @@ func NewGame(config GameConfig) (*Game, error) {
 
 	remainingWordList := append([]string{}, initialWordList...) // copy
 
+	freqMap := words.WordFrequencyMap{}
+
+	if config.FreqMap == nil {
+		freqMap, err = words.GetWordFrequencyMap()
+		if err != nil {
+			return nil, fmt.Errorf("unable to read frequency map - err: %w", err)
+		}
+	} else {
+		// copy
+		for k, v := range config.FreqMap {
+			freqMap[k] = v
+		}
+	}
+
 	answerInWordList := slices.Contains(initialWordList, config.Answer)
 	if !answerInWordList {
 		return nil, fmt.Errorf("provided answer %q is not in the word list", config.Answer)
-	}
-
-	freqMap, err := words.GetWordFrequencyMap()
-	if err != nil {
-		return nil, fmt.Errorf("unable to read frequency map - err: %w", err)
 	}
 
 	game := Game{
