@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"net/http"
 	"syscall/js"
 
 	"github.com/hnasser-dev/wordle-solver/internal/game"
@@ -21,33 +19,34 @@ type nyTimesApiResponse struct {
 	Editor          string `json:"editor"`
 }
 
-func getDateNowStr() string {
-	d := js.Global().Get("Date").New()
-	year := d.Call("getFullYear").Int()
-	month := d.Call("getMonth").Int() + 1 // JS months are 0-11
-	day := d.Call("getDate").Int()
-	return fmt.Sprintf("%04d-%02d-%02d", year, month, day)
-}
+// func getDateNowStr() string {
+// 	d := js.Global().Get("Date").New()
+// 	year := d.Call("getFullYear").Int()
+// 	month := d.Call("getMonth").Int() + 1 // JS months are 0-11
+// 	day := d.Call("getDate").Int()
+// 	return fmt.Sprintf("%04d-%02d-%02d", year, month, day)
+// }
 
-func getAnswerFromApi() (string, error) {
-	dateNowStr := getDateNowStr()
-	resp, err := http.Get(fmt.Sprintf("https://www.nytimes.com/svc/wordle/v2/%s.json", dateNowStr))
-	if err != nil {
-		return "", fmt.Errorf("unable to get answer from nytimes api - err: %w", err)
-	}
-	defer resp.Body.Close()
-	decoder := json.NewDecoder(resp.Body)
-	data := nyTimesApiResponse{}
-	err = decoder.Decode(&data)
-	if err != nil {
-		return "", fmt.Errorf("unable to decode response - err: %w", err)
-	}
-	return data.Solution, nil
-}
+// func getAnswerFromApi() (string, error) {
+// 	dateNowStr := getDateNowStr()
+// 	resp, err := http.Get(fmt.Sprintf("https://www.nytimes.com/svc/wordle/v2/%s.json", dateNowStr))
+// 	if err != nil {
+// 		return "", fmt.Errorf("unable to get answer from nytimes api - err: %w", err)
+// 	}
+// 	defer resp.Body.Close()
+// 	decoder := json.NewDecoder(resp.Body)
+// 	data := nyTimesApiResponse{}
+// 	err = decoder.Decode(&data)
+// 	if err != nil {
+// 		return "", fmt.Errorf("unable to decode response - err: %w", err)
+// 	}
+// 	return data.Solution, nil
+// }
 
 // solveWordle(mode, initialGuesses...) -> {gameWon bool, guesses []string}
 func solveWordle(this js.Value, args []js.Value) interface{} {
-	gameModeStr := args[0]
+	answer := args[0].String()
+	gameModeStr := args[1].String()
 	var gameMode game.GameMode
 	switch gameModeStr {
 	case "normal":
@@ -58,15 +57,15 @@ func solveWordle(this js.Value, args []js.Value) interface{} {
 		return js.ValueOf(fmt.Sprintf("error: invalid game mode type: %s"))
 	}
 	initialGuesses := []string{}
-	if len(args) > 1 {
-		for i, arg := range args[1:] {
-			initialGuesses[i] = arg.String()
+	if len(args) > 2 {
+		for _, arg := range args[2:] {
+			initialGuesses = append(initialGuesses, arg.String())
 		}
 	}
-	answer, err := getAnswerFromApi()
-	if err != nil {
-		return js.ValueOf(fmt.Sprintf("error: unable to retrieve answer from API - err: %s", err))
-	}
+	// answer, err := getAnswerFromApi()
+	// if err != nil {
+	// 	return js.ValueOf(fmt.Sprintf("error: unable to retrieve answer from API - err: %s", err))
+	// }
 	game, err := game.NewGame(
 		game.GameConfig{
 			Answer:         answer,
@@ -93,4 +92,5 @@ func main() {
 		js.Global().Set("freqMapError", js.ValueOf(fmt.Sprintf("unable to fetch word frequency map - err: %s", err)))
 	}
 	js.Global().Set("solveWordle", js.FuncOf(solveWordle))
+	select {}
 }

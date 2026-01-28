@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Solver</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="wasm_exec.js"></script>
+</head>
+<body>
+    <h2>Welcome to the Wordle Solver!!</h2>
+    <button id="play-today-btn">Play Today</button>
+    <script>
+        const go = new Go();
+        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+        .then((result) => {
+            go.run(result.instance);
+        })
+        const date = new Date;
+        const dateStr = `${date.getFullYear()}-${date.getMonth()+1}-${date.getDate()}`
+        console.log(dateStr)
+        document.querySelector("#play-today-btn").onclick = async () => {
+            console.log("solving wordle...")
+            const response = await fetch(`https://www.nytimes.com/svc/wordle/v2/${dateStr}.json`);
+            const data = await response.json();
+            console.log("retrieved data from nytimes")
+            const initialGuesses = ["hello"]
+            const result = solveWordle(data.solution, "normal", ...initialGuesses)
+            console.log(result.gameWon)
+            console.log(result.guesses)
+        }
+    </script>
+</body>
+</html>
