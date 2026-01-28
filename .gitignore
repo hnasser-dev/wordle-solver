@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.gitkeep
-*.log
 tmp
+dist
+*.log
 *_templ.go
