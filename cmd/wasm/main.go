@@ -19,30 +19,6 @@ type nyTimesApiResponse struct {
 	Editor          string `json:"editor"`
 }
 
-// func getDateNowStr() string {
-// 	d := js.Global().Get("Date").New()
-// 	year := d.Call("getFullYear").Int()
-// 	month := d.Call("getMonth").Int() + 1 // JS months are 0-11
-// 	day := d.Call("getDate").Int()
-// 	return fmt.Sprintf("%04d-%02d-%02d", year, month, day)
-// }
-
-// func getAnswerFromApi() (string, error) {
-// 	dateNowStr := getDateNowStr()
-// 	resp, err := http.Get(fmt.Sprintf("https://www.nytimes.com/svc/wordle/v2/%s.json", dateNowStr))
-// 	if err != nil {
-// 		return "", fmt.Errorf("unable to get answer from nytimes api - err: %w", err)
-// 	}
-// 	defer resp.Body.Close()
-// 	decoder := json.NewDecoder(resp.Body)
-// 	data := nyTimesApiResponse{}
-// 	err = decoder.Decode(&data)
-// 	if err != nil {
-// 		return "", fmt.Errorf("unable to decode response - err: %w", err)
-// 	}
-// 	return data.Solution, nil
-// }
-
 // solveWordle(mode, initialGuesses...) -> {gameWon bool, guesses []string}
 func solveWordle(this js.Value, args []js.Value) interface{} {
 	answer := args[0].String()
@@ -62,10 +38,6 @@ func solveWordle(this js.Value, args []js.Value) interface{} {
 			initialGuesses = append(initialGuesses, arg.String())
 		}
 	}
-	// answer, err := getAnswerFromApi()
-	// if err != nil {
-	// 	return js.ValueOf(fmt.Sprintf("error: unable to retrieve answer from API - err: %s", err))
-	// }
 	game, err := game.NewGame(
 		game.GameConfig{
 			Answer:         answer,
@@ -80,7 +52,11 @@ func solveWordle(this js.Value, args []js.Value) interface{} {
 	gameWon, guesses := game.PlayGameUntilEnd(true)
 	jsObj := js.Global().Get("Object").New()
 	jsObj.Set("gameWon", gameWon)
-	jsObj.Set("guesses", guesses)
+	jsGuesses := js.Global().Get("Array").New(len(guesses))
+	for i, guess := range guesses {
+		jsGuesses.SetIndex(i, guess)
+	}
+	jsObj.Set("guesses", jsGuesses)
 	return jsObj
 }
 
