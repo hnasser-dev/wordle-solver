@@ -4,4 +4,4 @@
 tmp
 dist
 *.log
-*_templ.go
+node_modules
