@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"syscall/js"
 
 	"github.com/hnasser-dev/wordle-solver/internal/game"
@@ -32,7 +31,6 @@ func main() {
 
 	// getSuggestions(guess string, colourPattern []string, gameMode string)
 	getSuggestions := js.FuncOf(func(_ js.Value, args []js.Value) any {
-		log.Println("hi!!")
 		if len(args) != 3 {
 			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestions - must be 3")
 		}
@@ -58,7 +56,12 @@ func main() {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse game mode: %s", err))
 		}
 		guessHelper.FilterRemainingWords(guess, colourPattern)
-		return guessHelper.GetSortedGuessOutcomes(gameMode)
+		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(gameMode)
+		returnArr := js.Global().Get("Array").New()
+		for _, guessOutcome := range sortedGuessOutcomes {
+			returnArr.Call("push", guessOutcome.Guess)
+		}
+		return returnArr
 	})
 
 	obj.Set("getSuggestions", getSuggestions)

@@ -100,10 +100,10 @@ func (g *GameSimulator) PerformOptimalGuess() bool {
 	var guess string
 	switch g.GameMode {
 	case DumbMode:
-		guess = sortedRemainingOutcomes[len(sortedRemainingOutcomes)-1].guess
+		guess = sortedRemainingOutcomes[len(sortedRemainingOutcomes)-1].Guess
 		slog.Debug("performing least optimal guess", "guess", guess)
 	case NormalMode:
-		guess = sortedRemainingOutcomes[0].guess
+		guess = sortedRemainingOutcomes[0].Guess
 		slog.Debug("performing optimal guess", "guess", guess)
 	default:
 		panic(fmt.Sprintf("unknown gameMode: %d", g.GameMode))

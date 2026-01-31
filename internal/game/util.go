@@ -26,7 +26,7 @@ type colourPattern [WordLength]colour
 type guessDistribution map[colourPattern][]string
 
 type guessOutcome struct {
-	guess        string
+	Guess        string
 	distribution guessDistribution
 	entropyBits  float64
 }
@@ -52,7 +52,7 @@ func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequency
 	guessOutcomes := make([]guessOutcome, 0, len(guessDistributions))
 	for guess, dist := range guessDistributions {
 		outcome := guessOutcome{
-			guess:        guess,
+			Guess:        guess,
 			distribution: dist,
 			entropyBits:  0.0,
 		}
@@ -68,7 +68,7 @@ func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequency
 		func(i, j int) bool {
 			// if equal entropies, prioritise higher frequency
 			if guessOutcomes[i].entropyBits == guessOutcomes[j].entropyBits {
-				return freqMap[guessOutcomes[i].guess] > freqMap[guessOutcomes[j].guess]
+				return freqMap[guessOutcomes[i].Guess] > freqMap[guessOutcomes[j].Guess]
 			} else {
 				return guessOutcomes[i].entropyBits > guessOutcomes[j].entropyBits
 			}

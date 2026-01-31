@@ -1,6 +1,10 @@
 let guessNum = 0;
 
-document.querySelector("#get-suggestions-btn").onclick = () => {
+document.querySelector("#get-suggestions-btn").onclick = (btn) => {
+    if (guessNum > 5) {
+        btn.disabled = true;
+        return;
+    }
     console.log("calling go func...");
     suggestions = guessHelper.getSuggestions(
         "hello",
@@ -8,6 +12,21 @@ document.querySelector("#get-suggestions-btn").onclick = () => {
         "normal"
     );
     console.log("suggestions", suggestions);
+    const guessNumStr = guessNum.toString();
+    const selectors = document.querySelectorAll(".suggestions-selector");
+    selectors.forEach((selector) => {
+        selector.innerHTML = "";
+        if (selector.dataset.rowIdx == guessNumStr) {
+            for (const suggestion of suggestions) {
+                selector.add(new Option(suggestion, suggestion));
+            }
+            selector.disabled = false;
+        } else {
+            selector.disabled = true;
+        }
+    });
+    guessNum++;
+    console.log(guessNum);
 };
 
 const letterPanels = document.querySelectorAll(".letter-panel");
