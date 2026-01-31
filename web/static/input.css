@@ -3,3 +3,11 @@
 body {
     background-color: rgb(99, 99, 99);
 }
+
+h2 {
+    font-size: 2.2rem;
+}
+
+.letter-panel:hover {
+    cursor: pointer;
+}
