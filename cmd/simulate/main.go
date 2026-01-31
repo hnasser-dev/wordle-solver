@@ -63,7 +63,7 @@ func main() {
 				defer wg.Done()
 				defer func() { <-sem }()
 				initialGuesses := []string{startingGuess}
-				game, err := game.NewGame(game.GameConfig{
+				game, err := game.NewGameSimulator(game.GameSimulatorConfig{
 					Answer:         answer,
 					GameMode:       game.NormalMode,
 					InitialGuesses: initialGuesses,

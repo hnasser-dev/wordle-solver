@@ -39,7 +39,7 @@ func (h *WordleHandler) Today(c *echo.Context, wordList []string) error {
 func playGame(answer string, mode game.GameMode, initialGuesses []string, wordList []string) (bool, []string, error) {
 	gameWon := false
 	guesses := []string{}
-	game, err := game.NewGame(game.GameConfig{Answer: answer, GameMode: mode, InitialGuesses: initialGuesses})
+	game, err := game.NewGameSimulator(game.GameSimulatorConfig{Answer: answer, GameMode: mode, InitialGuesses: initialGuesses})
 	if err != nil {
 		slog.Error("unable to create new game", "err", err.Error())
 		return gameWon, guesses, err

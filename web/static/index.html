@@ -6,91 +6,112 @@
     <title>Wordle Solver</title>
     <link rel="stylesheet" href="main.css">
     <script src="wasm_exec.js"></script>
+    <script src="main.js" defer></script>
 </head>
 <body>
     <h2>
         Welcome to the Wordle Solver!!
     </h2>
-    <div class="w-xs">
-        <div class="grid grid-cols-5 gap-4">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 border-gray-50 flex items-center justify-center text-2xl font-bold uppercase">H</div>
+    <div class="w-2xl">
+        <div id="letter-row-0" class="flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <select class="w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
+                <option>
+                    Option 1
+                </option>
+                <option>
+                    Option 2
+                </option>
+            </select>
+        </div>
+        <div id="letter-row-1" class="flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <select class="w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
+                <option>
+                    Option 1
+                </option>
+                <option>
+                    Option 2
+                </option>
+            </select>
+        </div>
+        <div id="letter-row-2" class="flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <select class="w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
+                <option>
+                    Option 1
+                </option>
+                <option>
+                    Option 2
+                </option>
+            </select>
+        </div>
+        <div id="letter-row-3" class="flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <select class="w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
+                <option>
+                    Option 1
+                </option>
+                <option>
+                    Option 2
+                </option>
+            </select>
+        </div>
+        <div id="letter-row-4" class="flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <select class="w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
+                <option>
+                    Option 1
+                </option>
+                <option>
+                    Option 2
+                </option>
+            </select>
+        </div>
+        <div id="letter-row-5" class="flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
+            <select class="w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
+                <option>
+                    Option 1
+                </option>
+                <option>
+                    Option 2
+                </option>
+            </select>
         </div>
     </div>
-    <button class="bg-amber-600 rounded-xs border" id="play-today-btn">Play Today</button>
+    <button class="bg-amber-600 rounded-xs border" id="get-suggestions-btn">Play Today</button>
+    
     <script>
-
-        const letterPanels = document.querySelectorAll(".letter-panel")
-        letterPanels.forEach(panel => {
-            panel.addEventListener("click", () => {
-                console.log("hi!")
-                panel.classList.toggle("bg-green-500")
-            })
-        })
-
-
-        const date = new Date;
-        const monthString = (date.getMonth()+1).toString().padStart(2, "0");
-        const dayString = date.getDate().toString().padStart(2, "0");
-        const dateStr = `${date.getFullYear()}-${monthString}-${dayString}`;
-
-        async function fetchWordleAnswer() {
-            const url = `https://cors-anywhere.com/https://www.nytimes.com/svc/wordle/v2/${dateStr}.json`
-            const data = await (async (url) => {
-                let attempts = 0;
-                while (attempts < 3) {
-                    try {
-                        const resp = await fetch(url);
-                        if (!resp.ok) {
-                            throw new Error(`Error querying ${url}: ${resp.status}`);
-                        }
-                        const data = await resp.json();
-                        return data;
-                    } catch (err) {
-                        attempts++;
-                        console.warn(`Attempt ${attempts} failed: ${err}`);
-                    }
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                }
-                throw new Error(`Failed to fetch ${url} after ${maxTries} attempts`);
-            })(url);
-            return data.solution ? data.solution : ""
-        }
-
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
         .then((result) => {
             go.run(result.instance);
         })
-
-        document.querySelector("#play-today-btn").onclick = async () => {
-            console.log("solving wordle...");
-            wordleAnswer = await fetchWordleAnswer();
-            console.log("wordleAnswer", wordleAnswer);
-            const initialGuesses = ["hello"];
-            const result = solveWordle(wordleAnswer, "normal", ...initialGuesses);
-            console.log(result.gameWon);
-            console.log(result.guesses);
-        }
-
     </script>
 </body>
 </html>

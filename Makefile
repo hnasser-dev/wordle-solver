@@ -9,6 +9,7 @@ wasm:
 static:
 	npx @tailwindcss/cli -i ./web/static/input.css -o ./dist/main.css
 	cp web/static/index.html dist/
+	cp web/static/main.js dist/
 
 build: newdist wasm static
 	@echo "Build complete - populated into dist/"

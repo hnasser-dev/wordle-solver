@@ -19,7 +19,7 @@ func main() {
 	mode := game.NormalMode
 	initialGuesses := []string{}
 
-	game, err := game.NewGame(game.GameConfig{Answer: answer, GameMode: mode, InitialGuesses: initialGuesses})
+	game, err := game.NewGameSimulator(game.GameSimulatorConfig{Answer: answer, GameMode: mode, InitialGuesses: initialGuesses})
 	if err != nil {
 		slog.Error("unable to create new game", "err", err)
 		os.Exit(1)
