@@ -1,4 +1,36 @@
 let guessNum = 0;
+let currentGuessArr = [];
+
+const charIsLetter = (char) => {
+    return /^[a-z]$/i.test(char);
+};
+
+document.addEventListener("keydown", (event) => {
+    isLetter = charIsLetter(event.key);
+    isBackspace = event.key === "Backspace";
+    if (isLetter || isBackspace) {
+        if (isBackspace) {
+            if (currentGuessArr.length >= 1) {
+                currentGuessArr.pop();
+            }
+        } else {
+            const char = event.key.toUpperCase();
+            if (currentGuessArr.length < 5) {
+                currentGuessArr.push(char);
+            }
+        }
+        const currentRow = document.querySelector(`#letter-row-${guessNum}`);
+        const currentLetterPanels =
+            currentRow.querySelectorAll(".letter-panel");
+        for (let i = 0; i < currentLetterPanels.length; i++) {
+            if (i < currentGuessArr.length) {
+                currentLetterPanels[i].innerHTML = currentGuessArr[i];
+            } else {
+                currentLetterPanels[i].innerHTML = "";
+            }
+        }
+    }
+});
 
 document.querySelector("#get-suggestions-btn").onclick = (btn) => {
     if (guessNum > 5) {
