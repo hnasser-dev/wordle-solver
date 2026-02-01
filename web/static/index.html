@@ -9,18 +9,15 @@
     <script src="main.js" defer></script>
 </head>
 <body>
-    <h2>
-        Welcome to the Wordle Solver!!
-    </h2>
-    <div class="w-2xl">
+    <h2>Wordle Solver</h2>
+    <div id="game-container" class="relative w-md">
         <div id="letter-row-0" class="flex gap-0">
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
-            <select disabled data-row-idx="0" class="suggestions-selector w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase">
-            </select>
+            <div id="row-side-panel-0" class="row-side-panel w-40 h-16 shrink-0 bg-gray-500 border-2"></div>
         </div>
         <div id="letter-row-1" class="flex gap-0">
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
@@ -28,8 +25,7 @@
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
-            <select disabled data-row-idx="1" id="suggestions-selector-1" class="suggestions-selector w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
-            </select>
+            <div id="row-side-panel-0" class="row-side-panel w-40 h-16 shrink-0 bg-gray-500 border-2"></div>
         </div>
         <div id="letter-row-2" class="flex gap-0">
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
@@ -37,8 +33,7 @@
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
-            <select disabled data-row-idx="2" id="suggestions-selector-2" class="suggestions-selector w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
-            </select>
+            <div id="row-side-panel-0" class="row-side-panel w-40 h-16 shrink-0 bg-gray-500 border-2"></div>
         </div>
         <div id="letter-row-3" class="flex gap-0">
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
@@ -46,8 +41,7 @@
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
-            <select disabled data-row-idx="3" id="suggestions-selector-3" class="suggestions-selector w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
-            </select>
+            <div id="row-side-panel-0" class="row-side-panel w-40 h-16 shrink-0 bg-gray-500 border-2"></div>
         </div>
         <div id="letter-row-4" class="flex gap-0">
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
@@ -55,8 +49,8 @@
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
-            <select disabled data-row-idx="4" id="suggestions-selector-4" class="suggestions-selector w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
-            </select>
+            <div id="row-side-panel-0" class="row-side-panel w-40 h-16 shrink-0 bg-gray-500 border-2"></div>
+
         </div>
         <div id="letter-row-5" class="flex gap-0">
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
@@ -64,11 +58,13 @@
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
             <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none"></div>
-            <select disabled data-row-idx="5" id="suggestions-selector-5" class="suggestions-selector w-40 h-16 block px-3 py-2.5 border border-default-medium text-lg uppercase rounded-base focus:ring-brand focus:border-brand shadow-md">
-            </select>
+            <div id="row-side-panel-0" class="row-side-panel w-40 h-16 shrink-0 bg-gray-500 border-2"></div>
+        </div>
+        <div id="loading-spinner" class="hidden absolute inset-0 flex items-center justify-center">
+            <div class="w-14 h-14 border-8 border-black border-t-blue-300 rounded-full animate-spin"></div>
         </div>
     </div>
-    <button class="bg-amber-600 rounded-xs border" id="get-suggestions-btn">Get Suggestions</button>
+    <button class="bg-amber-600 rounded-xs border" id="submit-guess-btn">Submit Guess</button>
     <script>
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
