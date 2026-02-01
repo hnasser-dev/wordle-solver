@@ -11,60 +11,63 @@
 <body>
     <h2>Wordle Solver</h2>
     <div id="game-container" class="relative w-lg">
-        <div id="letter-row-0" class="flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 bg-gray-500 border-2"></div>
+        <div id="game-row-0" class="game-row flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
         </div>
-        <div id="letter-row-1" class="flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 bg-gray-500 border-2"></div>
+        <div id="game-row-1" class="game-row flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
         </div>
-        <div id="letter-row-2" class="flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 bg-gray-500 border-2"></div>
+        <div id="game-row-2" class="game-row flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
         </div>
-        <div id="letter-row-3" class="flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 bg-gray-500 border-2"></div>
+        <div id="game-row-3" class="game-row flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
         </div>
-        <div id="letter-row-4" class="flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 bg-gray-500 border-2"></div>
+        <div id="game-row-4" class="game-row flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
 
         </div>
-        <div id="letter-row-5" class="flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-50 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 bg-gray-500 border-2"></div>
+        <div id="game-row-5" class="game-row flex gap-0">
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
         </div>
         <div id="loading-spinner" class="hidden absolute inset-0 flex items-center justify-center">
             <div class="w-14 h-14 border-8 border-black border-t-blue-300 rounded-full animate-spin"></div>
         </div>
         <div id="game-error-outer" class="hidden absolute text-center inset-0 flex items-center justify-center">
             <div id="game-error-inner" class="rounded-md p-2 border-2 bg-red-200 border-black"></div>
+        </div>
+        <div id="game-complete-outer" class="hidden absolute text-center inset-0 flex items-center justify-center">
+            <div id="game-complete-inner" class="rounded-md p-2 border-2 bg-green-200 border-black"></div>
         </div>
     </div>
     <!-- TODO - styling -->

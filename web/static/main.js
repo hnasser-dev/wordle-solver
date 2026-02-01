@@ -1,3 +1,13 @@
+/*
+TODO
+- Generate a full optimal word list (top N?)
+- Mobile support
+    - On screen keyboard
+- (Possibly?) Go back a row
+
+
+*/
+
 let guessNum = 0;
 let currentGuessArr = [];
 const colourClasses = [
@@ -5,25 +15,60 @@ const colourClasses = [
     ["bg-orange-200", "yellow"],
     ["bg-green-500", "green"],
 ];
+const disabledColour = "bg-gray-400";
+
+const showErrorPopup = (msg) => {
+    document.querySelector("#game-error-inner").innerHTML = msg;
+    document.querySelector("#game-error-outer").classList.remove("hidden");
+};
+
+const showGameCompletePopup = (msg) => {
+    document.querySelector("#game-complete-inner").innerHTML = msg;
+    document.querySelector("#game-complete-outer").classList.remove("hidden");
+};
 
 const charIsLetter = (char) => {
     return /^[a-z]$/i.test(char);
 };
 
-const populateRowPanels = (rowIdx) => {
-    const row = document.querySelector(`#letter-row-${rowIdx}`);
-    const letterPanels = row.querySelectorAll(".letter-panel");
-    for (let i = 0; i < letterPanels.length; i++) {
-        if (i < currentGuessArr.length) {
-            letterPanels[i].innerHTML = currentGuessArr[i];
-        } else {
-            letterPanels[i].innerHTML = "";
+const setInactiveColour = (elem) => {
+    [...elem.classList].forEach((cls) => {
+        if (cls.startsWith("bg-")) {
+            elem.classList.remove(cls);
         }
-    }
+    });
+    elem.classList.add("bg-gray-400");
+};
+
+const populateRowPanels = (rowIdx) => {
+    const rows = document.querySelectorAll(".game-row");
+    rows.forEach((row) => {
+        const letterPanels = row.querySelectorAll(".letter-panel");
+        const sidePanel = row.querySelector(".row-side-panel");
+        // update the active row
+        if (row.id === `game-row-${rowIdx}`) {
+            console.log("looking good!");
+            for (let i = 0; i < letterPanels.length; i++) {
+                const panel = letterPanels[i];
+                panel.classList.remove("bg-gray-400");
+                panel.classList.add("bg-gray-50");
+                if (i < currentGuessArr.length) {
+                    panel.innerHTML = currentGuessArr[i];
+                } else {
+                    panel.innerHTML = "";
+                }
+            }
+            sidePanel.classList.remove("bg-gray-400");
+            sidePanel.classList.add("bg-purple-100");
+        } else {
+            for (const elem of [sidePanel, ...letterPanels]) {
+                setInactiveColour(elem);
+            }
+        }
+    });
 };
 
 const updateRows = (suggestions, guessNum) => {
-    console.log(suggestions, guessNum);
     const rowSidePanels = document.querySelectorAll(".row-side-panel");
     rowSidePanels.forEach((sidePanel, idx) => {
         if (idx == guessNum) {
@@ -31,7 +76,7 @@ const updateRows = (suggestions, guessNum) => {
             submitBtn.id = "submit-guess-btn";
             submitBtn.innerHTML = "Submit";
             submitBtn.classList.add(
-                "w-24",
+                "w-20",
                 "h-16",
                 "bg-green-200",
                 "block",
@@ -39,7 +84,7 @@ const updateRows = (suggestions, guessNum) => {
                 "py-2.5",
                 "border",
                 "border-default-medium",
-                "text-lg",
+                "text-md",
                 "uppercase",
                 "text-center",
                 "rounded-md",
@@ -47,7 +92,6 @@ const updateRows = (suggestions, guessNum) => {
             );
             submitBtn.addEventListener("click", (event) => {
                 btn = event.currentTarget;
-                console.log("clicked!");
                 if (guessNum > 5 || currentGuessArr.length != 5) {
                     btn.disabled = true;
                     return;
@@ -59,32 +103,33 @@ const updateRows = (suggestions, guessNum) => {
                 loadingSpinner.classList.remove("hidden");
                 // set timeout allows the removal of the loadingSpinner again
                 setTimeout(() => {
-                    console.log("getting suggestions...");
                     suggestions = guessHelper.getSuggestions(
                         guess,
                         colourPattern,
                         "normal"
                     );
-                    console.log("suggestions:", suggestions);
                     if (!suggestions || suggestions.length == 0) {
-                        document.querySelector("#game-error-inner").innerHTML =
-                            "No possible answers left!<br>Are you sure you entered all the colours in correctly?";
-                        document
-                            .querySelector("#game-error-outer")
-                            .classList.remove("hidden");
+                        showErrorPopup(
+                            "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
+                        );
+                        loadingSpinner.classList.add("hidden");
+                        return;
+                    } else if (suggestions.length == 1) {
+                        showGameCompletePopup(
+                            `The correct answer is <b>${suggestions[0]}</b>`
+                        );
                         loadingSpinner.classList.add("hidden");
                         return;
                     }
                     guessNum++;
                     updateRows(suggestions, guessNum);
                     loadingSpinner.classList.add("hidden");
-                    console.log(guessNum);
                     btn.remove();
                 }, 10);
             });
             const selector = document.createElement("select");
             selector.classList.add(
-                "w-24",
+                "w-28",
                 "h-16",
                 "block",
                 "px-3",
@@ -101,9 +146,7 @@ const updateRows = (suggestions, guessNum) => {
             const suggestionOnChange = () => {
                 const selectedValue =
                     selector.options[selector.selectedIndex].value;
-                console.log("selectedValue:", selectedValue);
                 currentGuessArr = selectedValue.toUpperCase().split("");
-                console.log("currentGuessArr:", currentGuessArr);
                 populateRowPanels(guessNum);
             };
             selector.addEventListener("change", suggestionOnChange);
@@ -121,7 +164,7 @@ const updateRows = (suggestions, guessNum) => {
 
 const getColourPattern = (rowIdx) => {
     const colourPattern = [];
-    const row = document.querySelector(`#letter-row-${rowIdx}`);
+    const row = document.querySelector(`#game-row-${rowIdx}`);
     const letterPanels = row.querySelectorAll(".letter-panel");
     for (const panel of letterPanels) {
         const classes = panel.classList;
@@ -147,16 +190,8 @@ document.addEventListener("keydown", (event) => {
     }
     isLetter = charIsLetter(event.key);
     isBackspace = event.key === "Backspace";
-    isEnter = event.key === "Enter";
-    if (isLetter || isBackspace || isEnter) {
-        // submit guess
-        if (isEnter) {
-            if (currentGuessArr.length === 5) {
-                console.log("pretending to submit:", currentGuessArr);
-                document.querySelector("#submit-guess-btn").click();
-            }
-            return;
-        } else if (isBackspace) {
+    if (isLetter || isBackspace) {
+        if (isBackspace) {
             if (currentGuessArr.length >= 1) {
                 currentGuessArr.pop();
             }
