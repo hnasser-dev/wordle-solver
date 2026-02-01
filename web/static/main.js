@@ -22,6 +22,103 @@ const populateRowPanels = (rowIdx) => {
     }
 };
 
+const updateRows = (suggestions, guessNum) => {
+    console.log(suggestions, guessNum);
+    const rowSidePanels = document.querySelectorAll(".row-side-panel");
+    rowSidePanels.forEach((sidePanel, idx) => {
+        if (idx == guessNum) {
+            const submitBtn = document.createElement("button");
+            submitBtn.id = "submit-guess-btn";
+            submitBtn.innerHTML = "Submit";
+            submitBtn.classList.add(
+                "w-24",
+                "h-16",
+                "bg-green-200",
+                "block",
+                "px-3",
+                "py-2.5",
+                "border",
+                "border-default-medium",
+                "text-lg",
+                "uppercase",
+                "text-center",
+                "rounded-md",
+                "hover:cursor-pointer"
+            );
+            submitBtn.addEventListener("click", (event) => {
+                btn = event.currentTarget;
+                console.log("clicked!");
+                if (guessNum > 5 || currentGuessArr.length != 5) {
+                    btn.disabled = true;
+                    return;
+                }
+                const guess = currentGuessArr.join("").toLowerCase();
+                const colourPattern = getColourPattern(guessNum);
+                const loadingSpinner =
+                    document.querySelector("#loading-spinner");
+                loadingSpinner.classList.remove("hidden");
+                // set timeout allows the removal of the loadingSpinner again
+                setTimeout(() => {
+                    console.log("getting suggestions...");
+                    suggestions = guessHelper.getSuggestions(
+                        guess,
+                        colourPattern,
+                        "normal"
+                    );
+                    console.log("suggestions:", suggestions);
+                    if (!suggestions || suggestions.length == 0) {
+                        document.querySelector("#game-error-inner").innerHTML =
+                            "No possible answers left!<br>Are you sure you entered all the colours in correctly?";
+                        document
+                            .querySelector("#game-error-outer")
+                            .classList.remove("hidden");
+                        loadingSpinner.classList.add("hidden");
+                        return;
+                    }
+                    guessNum++;
+                    updateRows(suggestions, guessNum);
+                    loadingSpinner.classList.add("hidden");
+                    console.log(guessNum);
+                    btn.remove();
+                }, 10);
+            });
+            const selector = document.createElement("select");
+            selector.classList.add(
+                "w-24",
+                "h-16",
+                "block",
+                "px-3",
+                "py-2.5",
+                "border",
+                "border-default-medium",
+                "text-lg",
+                "uppercase",
+                "text-center"
+            );
+            for (const suggestion of suggestions) {
+                selector.add(new Option(suggestion.toUpperCase(), suggestion));
+            }
+            const suggestionOnChange = () => {
+                const selectedValue =
+                    selector.options[selector.selectedIndex].value;
+                console.log("selectedValue:", selectedValue);
+                currentGuessArr = selectedValue.toUpperCase().split("");
+                console.log("currentGuessArr:", currentGuessArr);
+                populateRowPanels(guessNum);
+            };
+            selector.addEventListener("change", suggestionOnChange);
+            sidePanel.replaceChildren(selector, submitBtn);
+            // force default value to populate the dropdown first
+            if (suggestions.length > 0) {
+                selector.value = suggestions[0];
+                suggestionOnChange();
+            }
+        } else {
+            sidePanel.innerHTML = "";
+        }
+    });
+};
+
 const getColourPattern = (rowIdx) => {
     const colourPattern = [];
     const row = document.querySelector(`#letter-row-${rowIdx}`);
@@ -73,71 +170,6 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
-document.querySelector("#submit-guess-btn").addEventListener("click", (btn) => {
-    if (guessNum > 5 || currentGuessArr.length != 5) {
-        btn.disabled = true;
-        return;
-    }
-    const guess = currentGuessArr.join("").toLowerCase();
-    const colourPattern = getColourPattern(guessNum);
-    console.log(guess, colourPattern);
-    console.log("calling go func...");
-
-    const loadingSpinner = document.querySelector("#loading-spinner");
-    loadingSpinner.classList.remove("hidden");
-    // set timeout allows the removal of the loadingSpinner again
-    setTimeout(() => {
-        suggestions = guessHelper.getSuggestions(
-            guess,
-            colourPattern,
-            "normal"
-        );
-        console.log(suggestions);
-        loadingSpinner.classList.add("hidden");
-        const rowSidePanels = document.querySelectorAll(".row-side-panel");
-        guessNum++;
-        rowSidePanels.forEach((sidePanel, idx) => {
-            if (idx == guessNum) {
-                const selector = document.createElement("select");
-                selector.classList.add(
-                    "w-40",
-                    "h-16",
-                    "block",
-                    "px-3",
-                    "py-2.5",
-                    "border",
-                    "border-default-medium",
-                    "text-lg",
-                    "uppercase",
-                    "text-center"
-                );
-                for (suggestion of suggestions) {
-                    selector.add(
-                        new Option(suggestion.toUpperCase(), suggestion)
-                    );
-                }
-                const suggestionOnChange = () => {
-                    const selectedValue =
-                        selector.options[selector.selectedIndex].value;
-                    currentGuessArr = selectedValue.toUpperCase().split("");
-                    populateRowPanels(guessNum);
-                };
-                selector.addEventListener("change", suggestionOnChange);
-                sidePanel.replaceChildren(selector);
-                // force default value to populate the dropdown first
-                if (suggestions) {
-                    selector.value = suggestions[0];
-                    suggestionOnChange();
-                }
-            } else {
-                sidePanel.innerHTML = "";
-            }
-        });
-        currentGuessArr = [];
-        console.log(guessNum);
-    }, 10);
-});
-
 const letterPanels = document.querySelectorAll(".letter-panel");
 letterPanels.forEach((panel) => {
     panel.addEventListener("click", () => {
@@ -153,4 +185,8 @@ letterPanels.forEach((panel) => {
     });
 });
 
-const wordDropDowns = document.querySelectorAll(".letter-panel");
+document.querySelector("#restart-btn").addEventListener("click", () => {
+    window.location.reload();
+});
+
+updateRows(["raise", "thing"], guessNum);
