@@ -12,6 +12,9 @@ var WordListData string
 //go:embed data/word_frequency_map.json
 var FreqMapData string
 
+//go:embed data/optimal_first_guesses.txt
+var OptimalFirstGuessesList string
+
 type WordFrequencyMap map[string]float64
 
 func GetWordList() []string {
@@ -26,4 +29,9 @@ func GetWordFrequencyMap() (WordFrequencyMap, error) {
 		return nil, err
 	}
 	return freqMap, nil
+}
+
+func GetOptimalFirstGuessesList() []string {
+	words := strings.Split(strings.TrimSpace(OptimalFirstGuessesList), "\n")
+	return words
 }

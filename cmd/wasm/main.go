@@ -11,6 +11,14 @@ import (
 var wordList []string
 var freqMap words.WordFrequencyMap
 
+func sliceToJsArray[T any](s []T) js.Value {
+	arr := make([]any, len(s))
+	for i, v := range s {
+		arr[i] = v
+	}
+	return js.ValueOf(arr)
+}
+
 func main() {
 
 	var err error
@@ -27,12 +35,27 @@ func main() {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 	}
 
-	obj := js.Global().Get("Object").New()
+	// default normal mode
+	gameMode := game.NormalMode
 
-	// getSuggestions(guess string, colourPattern []string, gameMode string)
+	sortedOptimalFirstGuesses := words.GetOptimalFirstGuessesList()
+	topN := 100
+	jsOptimalFirstGuesses := js.Global().Get("Array").New()
+	for idx, guess := range sortedOptimalFirstGuesses {
+		if idx >= topN {
+			break
+		}
+		jsOptimalFirstGuesses.Call("push", guess)
+	}
+
+	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
+
+	jsGuessHelper := js.Global().Get("Object").New()
+
+	// getSuggestions(guess string, colourPattern []string)
 	getSuggestions := js.FuncOf(func(_ js.Value, args []js.Value) any {
-		if len(args) != 3 {
-			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestions - must be 3")
+		if len(args) != 2 {
+			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestions - must be 2")
 		}
 		guess := args[0].String()
 		jsColourStringsArr := args[1]
@@ -51,10 +74,6 @@ func main() {
 		if err != nil {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse colour strings: %s", err))
 		}
-		gameMode, err := game.GameModeStringToGameMode(args[2].String())
-		if err != nil {
-			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse game mode: %s", err))
-		}
 		guessHelper.FilterRemainingWords(guess, colourPattern)
 		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(gameMode)
 		returnArr := js.Global().Get("Array").New()
@@ -64,8 +83,8 @@ func main() {
 		return returnArr
 	})
 
-	obj.Set("getSuggestions", getSuggestions)
-	js.Global().Set("guessHelper", obj)
+	jsGuessHelper.Set("getSuggestions", getSuggestions)
+	js.Global().Set("guessHelper", jsGuessHelper)
 
 	select {}
 }

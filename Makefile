@@ -2,6 +2,9 @@ newdist:
 	rm -rf dist
 	mkdir -p dist
 
+data:
+	go generate ./...
+
 wasm:
 	GOOS=js GOARCH=wasm go build -o dist/main.wasm ./cmd/wasm
 	cp web/static/wasm_exec.js dist/
@@ -11,6 +14,6 @@ static:
 	cp web/static/index.html dist/
 	cp web/static/main.js dist/
 
-build: newdist wasm static
+build: newdist data wasm static
 	@echo "Build complete - populated into dist/"
  

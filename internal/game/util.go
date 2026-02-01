@@ -107,15 +107,3 @@ func ColourStringsToColourPattern(colourSlice [WordLength]string) (colourPattern
 	}
 	return c, nil
 }
-
-func GameModeStringToGameMode(s string) (GameMode, error) {
-	s = strings.ToLower(s)
-	switch s {
-	case "normal":
-		return NormalMode, nil
-	case "dumb":
-		return DumbMode, nil
-	default:
-		return 0, fmt.Errorf("unable to parse string %s to a gamemode", s)
-	}
-}

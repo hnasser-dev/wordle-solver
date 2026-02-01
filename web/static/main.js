@@ -1,10 +1,8 @@
 /*
 TODO
-- Generate a full optimal word list (top N?)
 - Mobile support
     - On screen keyboard
-- (Possibly?) Go back a row
-
+- (Possibly?) Ability to go back a row
 
 */
 
@@ -105,8 +103,7 @@ const updateRows = (suggestions, guessNum) => {
                 setTimeout(() => {
                     suggestions = guessHelper.getSuggestions(
                         guess,
-                        colourPattern,
-                        "normal"
+                        colourPattern
                     );
                     if (!suggestions || suggestions.length == 0) {
                         showErrorPopup(
@@ -224,4 +221,8 @@ document.querySelector("#restart-btn").addEventListener("click", () => {
     window.location.reload();
 });
 
-updateRows(["raise", "thing"], guessNum);
+// optimalFirstGuesses defined in wasm
+
+window.mainJsInit = () => {
+    updateRows(optimalFirstGuesses, guessNum);
+};
