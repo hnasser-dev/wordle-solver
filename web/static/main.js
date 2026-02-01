@@ -85,6 +85,7 @@ document.querySelector("#submit-guess-btn").addEventListener("click", (btn) => {
 
     const loadingSpinner = document.querySelector("#loading-spinner");
     loadingSpinner.classList.remove("hidden");
+    // set timeout allows the removal of the loadingSpinner again
     setTimeout(() => {
         suggestions = guessHelper.getSuggestions(
             guess,
@@ -98,8 +99,6 @@ document.querySelector("#submit-guess-btn").addEventListener("click", (btn) => {
         rowSidePanels.forEach((sidePanel, idx) => {
             if (idx == guessNum) {
                 const selector = document.createElement("select");
-                console.log("hello");
-                selector.setAttribute("value", "eee");
                 selector.classList.add(
                     "w-40",
                     "h-16",
@@ -112,16 +111,24 @@ document.querySelector("#submit-guess-btn").addEventListener("click", (btn) => {
                     "uppercase",
                     "text-center"
                 );
-                for (const suggestion of suggestions) {
-                    selector.add(new Option(suggestion, suggestion));
+                for (suggestion of suggestions) {
+                    selector.add(
+                        new Option(suggestion.toUpperCase(), suggestion)
+                    );
                 }
-                selector.addEventListener("change", () => {
+                const suggestionOnChange = () => {
                     const selectedValue =
                         selector.options[selector.selectedIndex].value;
                     currentGuessArr = selectedValue.toUpperCase().split("");
                     populateRowPanels(guessNum);
-                });
+                };
+                selector.addEventListener("change", suggestionOnChange);
                 sidePanel.replaceChildren(selector);
+                // force default value to populate the dropdown first
+                if (suggestions) {
+                    selector.value = suggestions[0];
+                    suggestionOnChange();
+                }
             } else {
                 sidePanel.innerHTML = "";
             }
