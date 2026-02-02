@@ -9,103 +9,105 @@
     <script src="main.js" defer></script>
 </head>
 <body>
-    <h2>Wordle Solver</h2>
-    <div id="game-container" class="relative w-lg">
-        <div id="game-row-0" class="game-row flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
-        </div>
-        <div id="game-row-1" class="game-row flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
-        </div>
-        <div id="game-row-2" class="game-row flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
-        </div>
-        <div id="game-row-3" class="game-row flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
-        </div>
-        <div id="game-row-4" class="game-row flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
-        </div>
-        <div id="game-row-5" class="game-row flex gap-0">
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
-            <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
-        </div>
-        <div id="loading-spinner" class="hidden absolute inset-0 flex items-center justify-center">
-            <div class="w-14 h-14 border-8 border-black border-t-blue-300 rounded-full animate-spin"></div>
-        </div>
-        <div id="game-error-outer" class="hidden absolute text-center inset-0 flex items-center justify-center">
-            <div id="game-error-inner" class="rounded-md p-2 border-2 bg-red-200 border-black"></div>
-        </div>
-        <div id="game-complete-outer" class="hidden absolute text-center inset-0 flex items-center justify-center">
-            <div id="game-complete-inner" class="rounded-md p-2 border-2 bg-green-200 border-black"></div>
-        </div>
-        <div id="keyboard" class="flex flex-col gap-1">
-            <div class="keyboard-row flex items-center justify-center gap-3">
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">q</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">w</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">e</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">r</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">t</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">y</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">u</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">i</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">o</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">p</button>
+    <div id="game-container-outer" class="bg-amber-950 w-lg p-2 rounded-2xl">
+        <h2 class="text-gray-100 text-center p-2">Wordle Solver</h2>
+        <div id="game-container-inner" class="relative">
+            <div id="game-row-0" class="game-row flex gap-0">
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
             </div>
-            <div class="keyboard-row flex items-center justify-center gap-3">
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">a</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">s</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">d</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">f</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">g</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">h</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">j</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">k</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">l</button>
+            <div id="game-row-1" class="game-row flex gap-0">
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
             </div>
-            <div class="keyboard-row flex items-center justify-center gap-3">
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">z</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">x</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">c</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">v</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">b</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">n</button>
-                <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">m</button>
-                <button id="keyboard-key-backspace" class="w-18 h-12 bg-gray-50 rounded-md text-3xl hover:cursor-pointer">&#8592;</button>
+            <div id="game-row-2" class="game-row flex gap-0">
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
+            </div>
+            <div id="game-row-3" class="game-row flex gap-0">
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
+            </div>
+            <div id="game-row-4" class="game-row flex gap-0">
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
+            </div>
+            <div id="game-row-5" class="game-row flex gap-0">
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="letter-panel w-16 h-16 bg-gray-400 border-2 flex items-center justify-center text-2xl font-bold uppercase select-none hover:cursor-pointer"></div>
+                <div class="row-side-panel flex w-48 h-16 shrink-0 border-2"></div>
+            </div>
+            <div id="loading-spinner" class="hidden absolute inset-0 flex items-center justify-center">
+                <div class="w-14 h-14 border-8 border-black border-t-blue-300 rounded-full animate-spin"></div>
+            </div>
+            <div id="game-error-outer" class="hidden absolute text-center inset-0 flex items-center justify-center">
+                <div id="game-error-inner" class="rounded-md p-2 border-2 bg-red-200 border-black"></div>
+            </div>
+            <div id="game-complete-outer" class="hidden absolute text-center inset-0 flex items-center justify-center">
+                <div id="game-complete-inner" class="rounded-md p-2 border-2 bg-green-200 border-black"></div>
+            </div>
+            <div id="keyboard" class="flex flex-col gap-1">
+                <div class="keyboard-row flex items-center justify-center gap-3">
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">q</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">w</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">e</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">r</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">t</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">y</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">u</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">i</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">o</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">p</button>
+                </div>
+                <div class="keyboard-row flex items-center justify-center gap-3">
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">a</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">s</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">d</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">f</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">g</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">h</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">j</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">k</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">l</button>
+                </div>
+                <div class="keyboard-row flex items-center justify-center gap-3">
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">z</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">x</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">c</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">v</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">b</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">n</button>
+                    <button class="keyboard-key-letter w-10 h-12 bg-gray-50 rounded-md text-lg hover:cursor-pointer">m</button>
+                    <button id="keyboard-key-backspace" class="w-18 h-12 bg-gray-50 rounded-md text-3xl hover:cursor-pointer">&#8592;</button>
+                </div>
             </div>
         </div>
+        <!-- TODO - styling -->
+        <button id="restart-btn" class="w-30 h-20 bg-red-300 rounded-lg text-xl hover:cursor-pointer">Restart</button>
     </div>
-    <!-- TODO - styling -->
-    <button id="restart-btn" class="w-30 h-20 bg-red-300 rounded-lg text-xl hover:cursor-pointer">Restart</button>
     <script>
         const go = new Go();
         WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
