@@ -1,9 +1,7 @@
 /*
 TODO
 - Mobile support
-    - On screen keyboard
 - (Possibly?) Ability to go back a row
-
 */
 
 const colourClasses = [
@@ -186,26 +184,30 @@ const getColourPattern = (rowIdx) => {
     return colourPattern;
 };
 
-document.addEventListener("keydown", (event) => {
-    // prevent holding the button down
-    if (event.repeat) {
-        return;
-    }
-    isLetter = charIsLetter(event.key);
-    isBackspace = event.key === "Backspace";
+const handlePressKey = (key) => {
+    isLetter = charIsLetter(key);
+    isBackspace = key === "Backspace";
     if (isLetter || isBackspace) {
         if (isBackspace) {
             if (currentGuessArr.length >= 1) {
                 currentGuessArr.pop();
             }
         } else {
-            const char = event.key.toUpperCase();
+            const char = key.toUpperCase();
             if (currentGuessArr.length < 5) {
                 currentGuessArr.push(char);
             }
         }
         populateRowPanels(guessNum);
     }
+};
+
+document.addEventListener("keydown", (event) => {
+    // prevent holding the button down
+    if (event.repeat) {
+        return;
+    }
+    handlePressKey(event.key);
 });
 
 const letterPanels = document.querySelectorAll(".letter-panel");
@@ -223,12 +225,23 @@ letterPanels.forEach((panel) => {
     });
 });
 
+const keyboardKeys = document.querySelectorAll(".keyboard-key-letter");
+keyboardKeys.forEach((key) => {
+    key.addEventListener("click", (event) => {
+        const letter = event.currentTarget.innerHTML;
+        handlePressKey(letter);
+    });
+});
+const backspaceKey = document.querySelector("#keyboard-key-backspace");
+backspaceKey.addEventListener("click", (event) => {
+    handlePressKey("Backspace");
+});
+
 document.querySelector("#restart-btn").addEventListener("click", () => {
     window.location.reload();
 });
 
-// optimalFirstGuesses defined in wasm
-
 window.mainJsInit = () => {
+    // optimalFirstGuesses defined in wasm
     updateRows(optimalFirstGuesses, guessNum);
 };
