@@ -51,7 +51,6 @@ func main() {
 	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
 
 	jsGuessHelper := js.Global().Get("Object").New()
-
 	// getSuggestions(guess string, colourPattern []string)
 	getSuggestions := js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) != 2 {

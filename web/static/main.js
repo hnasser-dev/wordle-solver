@@ -6,14 +6,15 @@ TODO
 
 */
 
-let guessNum = 0;
-let currentGuessArr = [];
 const colourClasses = [
     ["bg-gray-50", "grey"],
     ["bg-orange-200", "yellow"],
     ["bg-green-500", "green"],
 ];
 const disabledColour = "bg-gray-400";
+
+let guessNum = 0;
+let currentGuessArr = [];
 
 const showErrorPopup = (msg) => {
     document.querySelector("#game-error-inner").innerHTML = msg;
@@ -45,7 +46,6 @@ const populateRowPanels = (rowIdx) => {
         const sidePanel = row.querySelector(".row-side-panel");
         // update the active row
         if (row.id === `game-row-${rowIdx}`) {
-            console.log("looking good!");
             for (let i = 0; i < letterPanels.length; i++) {
                 const panel = letterPanels[i];
                 panel.classList.remove("bg-gray-400");
@@ -96,6 +96,12 @@ const updateRows = (suggestions, guessNum) => {
                 }
                 const guess = currentGuessArr.join("").toLowerCase();
                 const colourPattern = getColourPattern(guessNum);
+                if (colourPattern.every((val) => val === "green")) {
+                    showGameCompletePopup(
+                        `Congratulations! The correct answer is <b>${guess}</b>`
+                    );
+                    return;
+                }
                 const loadingSpinner =
                     document.querySelector("#loading-spinner");
                 loadingSpinner.classList.remove("hidden");
