@@ -3,7 +3,7 @@ const colourClasses = [
     ["bg-orange-200", "yellow"],
     ["bg-green-500", "green"],
 ];
-const disabledColour = "bg-gray-400";
+const disabledColour = "bg-gray-600";
 
 let guessNum = 0;
 let currentGuessArr = [];
@@ -68,11 +68,11 @@ const populateRowPanels = () => {
                     panel.innerHTML = "";
                 }
             }
-            sidePanel.classList.remove("bg-gray-400");
+            // sidePanel.classList.remove("bg-gray-400");
         } else if (rowIdx === guessNum - 1) {
             for (const elem of letterPanels) {
                 removeOpacity(elem);
-                elem.classList.add("opacity-75");
+                elem.classList.add("opacity-50");
             }
         }
     });
