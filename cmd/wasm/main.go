@@ -35,6 +35,12 @@ func main() {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 	}
 
+	jsAllValidWords := js.Global().Get("Set").New()
+	for _, guess := range wordList {
+		jsAllValidWords.Call("add", guess)
+	}
+	js.Global().Set("allValidWordsSet", jsAllValidWords)
+
 	// default normal mode
 	gameMode := game.NormalMode
 

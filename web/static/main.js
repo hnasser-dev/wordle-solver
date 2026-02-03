@@ -23,6 +23,18 @@ const showGameCompletePopup = (msg) => {
     document.querySelector("#game-complete-outer").classList.remove("hidden");
 };
 
+const shakeActiveLetterPanels = () => {
+    const activeLetterPanels = document
+        .querySelector(`#game-row-${guessNum}`)
+        .querySelectorAll(".letter-panel");
+    activeLetterPanels.forEach((panel) => {
+        panel.classList.add("shake");
+        setTimeout(() => {
+            panel.classList.remove("shake");
+        }, 200);
+    });
+};
+
 const charIsLetter = (char) => {
     return /^[a-z]$/i.test(char);
 };
@@ -54,8 +66,6 @@ const populateRowPanels = (rowIdx) => {
                 }
             }
             sidePanel.classList.remove("bg-gray-400");
-            // sidePanel.classList.add("flex")
-            // sidePanel.classList.add("bg-purple-100");
         } else {
             for (const elem of letterPanels) {
                 setInactiveColour(elem);
@@ -64,7 +74,7 @@ const populateRowPanels = (rowIdx) => {
     });
 };
 
-const updateRows = (suggestions, guessNum) => {
+const updateRows = (suggestions) => {
     const rowSidePanels = document.querySelectorAll(".row-side-panel");
     rowSidePanels.forEach((sidePanel, idx) => {
         if (idx == guessNum) {
@@ -92,10 +102,13 @@ const updateRows = (suggestions, guessNum) => {
             submitBtn.addEventListener("click", (event) => {
                 btn = event.currentTarget;
                 if (guessNum > 5 || currentGuessArr.length != 5) {
-                    btn.disabled = true;
                     return;
                 }
                 const guess = currentGuessArr.join("").toLowerCase();
+                if (!allValidWordsSet.has(guess)) {
+                    shakeActiveLetterPanels();
+                    return;
+                }
                 const colourPattern = getColourPattern(guessNum);
                 if (colourPattern.every((val) => val === "green")) {
                     showGameCompletePopup(
@@ -189,8 +202,12 @@ const getColourPattern = (rowIdx) => {
 const handlePressKey = (key) => {
     isLetter = charIsLetter(key);
     isBackspace = key === "Backspace";
-    if (isLetter || isBackspace) {
-        if (isBackspace) {
+    isEnter = key === "Enter";
+    if (isLetter || isBackspace || isEnter) {
+        if (isEnter) {
+            document.querySelector("#submit-guess-btn").click();
+            return;
+        } else if (isBackspace) {
             if (currentGuessArr.length >= 1) {
                 currentGuessArr.pop();
             }
@@ -245,5 +262,5 @@ document.querySelector("#restart-btn").addEventListener("click", () => {
 
 window.mainJsInit = () => {
     // optimalFirstGuesses defined in wasm
-    updateRows(optimalFirstGuesses, guessNum);
+    updateRows(optimalFirstGuesses);
 };
