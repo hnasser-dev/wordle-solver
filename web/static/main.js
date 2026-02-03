@@ -1,8 +1,3 @@
-/*
-TODO
-- Prevent typing in an invalid word
-*/
-
 const colourClasses = [
     ["bg-gray-50", "grey"],
     ["bg-orange-200", "yellow"],
@@ -39,25 +34,33 @@ const charIsLetter = (char) => {
     return /^[a-z]$/i.test(char);
 };
 
-const setInactiveColour = (elem) => {
+const removeBgColours = (elem) => {
     [...elem.classList].forEach((cls) => {
         if (cls.startsWith("bg-")) {
             elem.classList.remove(cls);
         }
     });
-    elem.classList.add("bg-gray-400");
 };
 
-const populateRowPanels = (rowIdx) => {
+const removeOpacity = (elem) => {
+    [...elem.classList].forEach((cls) => {
+        if (cls.startsWith("opacity-")) {
+            elem.classList.remove(cls);
+        }
+    });
+};
+
+const populateRowPanels = () => {
     const rows = document.querySelectorAll(".game-row");
+    const rowIdxPattern = /^game-row-(\d+)$/;
     rows.forEach((row) => {
         const letterPanels = row.querySelectorAll(".letter-panel");
         const sidePanel = row.querySelector(".row-side-panel");
-        // update the active row
-        if (row.id === `game-row-${rowIdx}`) {
+        const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
+        if (rowIdx === guessNum) {
             for (let i = 0; i < letterPanels.length; i++) {
                 const panel = letterPanels[i];
-                panel.classList.remove("bg-gray-400");
+                removeBgColours(panel);
                 panel.classList.add("bg-gray-50");
                 if (i < currentGuessArr.length) {
                     panel.innerHTML = currentGuessArr[i];
@@ -66,9 +69,10 @@ const populateRowPanels = (rowIdx) => {
                 }
             }
             sidePanel.classList.remove("bg-gray-400");
-        } else {
+        } else if (rowIdx === guessNum - 1) {
             for (const elem of letterPanels) {
-                setInactiveColour(elem);
+                removeOpacity(elem);
+                elem.classList.add("opacity-75");
             }
         }
     });
@@ -163,7 +167,7 @@ const updateRows = (suggestions) => {
                 const selectedValue =
                     selector.options[selector.selectedIndex].value;
                 currentGuessArr = selectedValue.toUpperCase().split("");
-                populateRowPanels(guessNum);
+                populateRowPanels();
             };
             selector.addEventListener("change", suggestionOnChange);
             sidePanel.replaceChildren(selector, submitBtn);
@@ -217,7 +221,7 @@ const handlePressKey = (key) => {
                 currentGuessArr.push(char);
             }
         }
-        populateRowPanels(guessNum);
+        populateRowPanels();
     }
 };
 
