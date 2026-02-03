@@ -1,7 +1,6 @@
 /*
 TODO
-- Mobile support
-- (Possibly?) Ability to go back a row
+- Prevent typing in an invalid word
 */
 
 const colourClasses = [
