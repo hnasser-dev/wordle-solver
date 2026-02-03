@@ -86,7 +86,9 @@ const updateRows = (suggestions, guessNum) => {
                 "font-bold",
                 "text-center",
                 "rounded-md",
-                "hover:cursor-pointer"
+                "hover:cursor-pointer",
+                "active:translate-y-0.5",
+                "active:shadow-inner"
             );
             submitBtn.addEventListener("click", (event) => {
                 btn = event.currentTarget;
