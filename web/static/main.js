@@ -55,9 +55,10 @@ const populateRowPanels = (rowIdx) => {
                 }
             }
             sidePanel.classList.remove("bg-gray-400");
-            sidePanel.classList.add("bg-purple-100");
+            // sidePanel.classList.add("flex")
+            // sidePanel.classList.add("bg-purple-100");
         } else {
-            for (const elem of [sidePanel, ...letterPanels]) {
+            for (const elem of letterPanels) {
                 setInactiveColour(elem);
             }
         }
@@ -74,14 +75,15 @@ const updateRows = (suggestions, guessNum) => {
             submitBtn.classList.add(
                 "w-20",
                 "h-16",
-                "bg-green-200",
+                "border",
+                "bg-lime-200",
                 "block",
                 "px-3",
                 "py-2.5",
                 "border",
                 "border-default-medium",
                 "text-md",
-                "uppercase",
+                "font-bold",
                 "text-center",
                 "rounded-md",
                 "hover:cursor-pointer"
@@ -131,15 +133,14 @@ const updateRows = (suggestions, guessNum) => {
             const selector = document.createElement("select");
             selector.classList.add(
                 "w-28",
-                "h-16",
-                "block",
-                "px-3",
-                "py-2.5",
                 "border",
-                "border-default-medium",
+                "h-16",
+                "bg-sky-300",
                 "text-lg",
+                "font-bold",
                 "uppercase",
-                "text-center"
+                "text-center",
+                "rounded-md"
             );
             for (const suggestion of suggestions) {
                 selector.add(new Option(suggestion.toUpperCase(), suggestion));
@@ -233,7 +234,7 @@ keyboardKeys.forEach((key) => {
     });
 });
 const backspaceKey = document.querySelector("#keyboard-key-backspace");
-backspaceKey.addEventListener("click", (event) => {
+backspaceKey.addEventListener("click", () => {
     handlePressKey("Backspace");
 });
 
