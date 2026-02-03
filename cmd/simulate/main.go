@@ -33,7 +33,7 @@ func main() {
 	}
 	fileLogger := slog.New(slog.NewJSONHandler(logFile, &slog.HandlerOptions{Level: slog.LevelInfo}))
 
-	wordList := words.GetWordList()
+	possibleAnswers := words.GetPossibleAnswers()
 
 	freq, err := words.GetWordFrequencyMap()
 	if err != nil {
@@ -42,7 +42,7 @@ func main() {
 	}
 
 	// independent subset of list
-	startingGuessesList := append([]string{}, wordList[:8]...)
+	startingGuessesList := append([]string{}, possibleAnswers[:8]...)
 
 	allAvgGuesses := make([]avgGuessesEntry, 0, len(startingGuessesList))
 	allWinRates := make([]winRatesEntry, 0, len(startingGuessesList))
@@ -56,7 +56,7 @@ func main() {
 		totalNumGames := 0
 		totalNumGuesses := 0
 		totalNumWins := 0
-		for _, answer := range wordList {
+		for _, answer := range possibleAnswers {
 			wg.Add(1)
 			sem <- struct{}{} // block until there is space in the sem
 			go func() {
@@ -67,7 +67,7 @@ func main() {
 					Answer:         answer,
 					GameMode:       game.NormalMode,
 					InitialGuesses: initialGuesses,
-					WordList:       wordList,
+					WordList:       possibleAnswers,
 					FreqMap:        freq,
 				})
 				if err != nil {

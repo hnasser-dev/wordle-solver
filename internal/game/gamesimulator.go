@@ -52,7 +52,7 @@ func NewGameSimulator(config GameSimulatorConfig) (*GameSimulator, error) {
 	}
 	var initialWordList []string
 	if config.WordList == nil {
-		initialWordList = words.GetWordList()
+		initialWordList = words.GetPossibleAnswers()
 	} else {
 		initialWordList = append([]string{}, config.WordList...) // copy
 	}

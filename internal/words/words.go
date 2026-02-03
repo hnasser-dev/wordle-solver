@@ -6,8 +6,11 @@ import (
 	"strings"
 )
 
-//go:embed data/word_list.txt
-var WordListData string
+//go:embed data/all_possible_answers.txt
+var PossibleAnswersData string
+
+//go:embed data/all_valid_guesses.txt
+var ValidGuessesData string
 
 //go:embed data/word_frequency_map.json
 var FreqMapData string
@@ -17,8 +20,13 @@ var OptimalFirstGuessesList string
 
 type WordFrequencyMap map[string]float64
 
-func GetWordList() []string {
-	words := strings.Split(strings.TrimSpace(WordListData), "\n")
+func GetPossibleAnswers() []string {
+	words := strings.Split(strings.TrimSpace(PossibleAnswersData), "\n")
+	return words
+}
+
+func GetValidGuesses() []string {
+	words := strings.Split(strings.TrimSpace(ValidGuessesData), "\n")
 	return words
 }
 

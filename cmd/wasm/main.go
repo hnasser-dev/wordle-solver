@@ -8,8 +8,9 @@ import (
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
-var wordList []string
-var freqMap words.WordFrequencyMap
+// var possibleAnswers []string
+// var validGuesses []string
+// var freqMap words.WordFrequencyMap
 
 func sliceToJsArray[T any](s []T) js.Value {
 	arr := make([]any, len(s))
@@ -23,23 +24,24 @@ func main() {
 
 	var err error
 
-	wordList = words.GetWordList()
+	possibleAnswers := words.GetPossibleAnswers()
 
-	freqMap, err = words.GetWordFrequencyMap()
+	freqMap, err := words.GetWordFrequencyMap()
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to fetch word frequency map - err: %s", err))
 	}
 
-	guessHelper, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: wordList, FreqMap: freqMap})
+	guessHelper, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 	}
 
-	jsAllValidWords := js.Global().Get("Set").New()
-	for _, guess := range wordList {
-		jsAllValidWords.Call("add", guess)
+	validGuesses := words.GetValidGuesses()
+	jsAllValidGuesses := js.Global().Get("Set").New()
+	for _, guess := range validGuesses {
+		jsAllValidGuesses.Call("add", guess)
 	}
-	js.Global().Set("allValidWordsSet", jsAllValidWords)
+	js.Global().Set("allValidGuessesList", jsAllValidGuesses)
 
 	// default normal mode
 	gameMode := game.NormalMode

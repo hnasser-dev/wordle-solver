@@ -27,7 +27,7 @@ func NewGuessHelper(config GuessHelperConfig) (*GuessHelper, error) {
 	var err error
 	var remainingWords []string
 	if config.WordList == nil {
-		remainingWords = words.GetWordList()
+		remainingWords = words.GetPossibleAnswers()
 	} else {
 		remainingWords = append([]string{}, config.WordList...) // copy
 	}

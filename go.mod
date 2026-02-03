@@ -3,13 +3,9 @@ module github.com/hnasser-dev/wordle-solver
 go 1.25.0
 
 require (
-	github.com/a-h/templ v0.3.977
-	github.com/labstack/echo/v5 v5.0.0
-)
-
-require (
 	dario.cat/mergo v1.0.2 // indirect
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
+	github.com/a-h/templ v0.3.977 // indirect
 	github.com/air-verse/air v1.64.4 // indirect
 	github.com/andybalholm/brotli v1.2.0 // indirect
 	github.com/bep/godartsass/v2 v2.5.0 // indirect
@@ -34,7 +30,6 @@ require (
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
-	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.8 // indirect
 )

@@ -105,7 +105,7 @@ const updateRows = (suggestions) => {
                     return;
                 }
                 const guess = currentGuessArr.join("").toLowerCase();
-                if (!allValidWordsSet.has(guess)) {
+                if (!allValidGuessesList.has(guess)) {
                     shakeActiveLetterPanels();
                     return;
                 }
