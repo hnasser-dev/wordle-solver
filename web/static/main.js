@@ -55,7 +55,6 @@ const populateRowPanels = () => {
     const rowIdxPattern = /^game-row-(\d+)$/;
     rows.forEach((row) => {
         const letterPanels = row.querySelectorAll(".letter-panel");
-        const sidePanel = row.querySelector(".row-side-panel");
         const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
         if (rowIdx === guessNum) {
             for (let i = 0; i < letterPanels.length; i++) {
@@ -68,7 +67,6 @@ const populateRowPanels = () => {
                     panel.innerHTML = "";
                 }
             }
-            // sidePanel.classList.remove("bg-gray-400");
         } else if (rowIdx === guessNum - 1) {
             for (const elem of letterPanels) {
                 removeOpacity(elem);
