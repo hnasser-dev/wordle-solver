@@ -4,6 +4,8 @@
 
 ### Accessible at: [hnasser-dev.github.io/wordle-solver/](https://hnasser-dev.github.io/wordle-solver/)
 
+<img width="699" height="887" alt="image" src="https://github.com/user-attachments/assets/bee083be-9d56-4847-9c61-5d850643f23d" />
+
 ### Instructions
 
 - Make a guess in Wordle, and note down the colour of the tiles.
