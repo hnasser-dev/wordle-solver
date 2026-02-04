@@ -1,0 +1,73 @@
+name: Deploy site to GitHub Pages
+
+on:
+
+  push:
+    branches: ["main"]
+
+  workflow_dispatch:
+    inputs:
+      logLevel:
+          description: "Log level"
+          required: true
+          default: "warning"
+      environment:
+          description: "Environment to deploy"
+          required: false
+          default: "staging"
+          
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+            go-version: "1.25.6"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: "npm"
+
+      - name: Install dependencies
+        run: sudo apt-get install build-essential && npm ic
+
+      - name: Run Make
+        run: make build
+
+      - name: Upload files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

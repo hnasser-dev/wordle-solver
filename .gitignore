@@ -1,6 +1,7 @@
 .*
 !.gitignore
 !.gitkeep
+!.github
 tmp
 dist
 *.log
