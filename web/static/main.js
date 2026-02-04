@@ -55,7 +55,6 @@ const populateRowPanels = () => {
     const rowIdxPattern = /^game-row-(\d+)$/;
     rows.forEach((row) => {
         const letterPanels = row.querySelectorAll(".letter-panel");
-        const sidePanel = row.querySelector(".row-side-panel");
         const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
         if (rowIdx === guessNum) {
             for (let i = 0; i < letterPanels.length; i++) {
@@ -68,7 +67,6 @@ const populateRowPanels = () => {
                     panel.innerHTML = "";
                 }
             }
-            // sidePanel.classList.remove("bg-gray-400");
         } else if (rowIdx === guessNum - 1) {
             for (const elem of letterPanels) {
                 removeOpacity(elem);
@@ -86,16 +84,19 @@ const updateRows = (suggestions) => {
             submitBtn.id = "submit-guess-btn";
             submitBtn.innerHTML = "Submit";
             submitBtn.classList.add(
-                "w-20",
-                "h-16",
+                "w-16",
+                "sm:w-18",
+                "md:w-20",
+                "h-10",
+                "sm:h-13",
+                "md:h-16",
                 "border",
                 "bg-lime-200",
                 "block",
-                "px-3",
-                "py-2.5",
                 "border",
                 "border-default-medium",
-                "text-md",
+                "text-sm",
+                "md:text-md",
                 "font-bold",
                 "text-center",
                 "rounded-md",
@@ -150,11 +151,16 @@ const updateRows = (suggestions) => {
             });
             const selector = document.createElement("select");
             selector.classList.add(
-                "w-28",
+                "w-20",
+                "sm:w-24",
+                "md:w-28",
                 "border",
-                "h-16",
+                "h-10",
+                "sm:h-13",
+                "md:h-16",
                 "bg-sky-300",
-                "text-lg",
+                "text-md",
+                "md:text-lg",
                 "font-bold",
                 "uppercase",
                 "text-center",
