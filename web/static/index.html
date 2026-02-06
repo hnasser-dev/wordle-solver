@@ -115,12 +115,17 @@
         </div>
     </div>
     <script>
+        const loadingSpinner = document.querySelector("#loading-spinner");
+        loadingSpinner.classList.remove("hidden");
         const go = new Go();
-        WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
-        .then((result) => {
-            go.run(result.instance);
-            window.mainJsInit();
-        })
+        setTimeout(() => {
+            WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject)
+            .then((result) => {
+                go.run(result.instance);
+                window.mainJsInit();
+                loadingSpinner.classList.add("hidden");
+            })  
+        }, 10)
     </script>
 </body>
 </html>

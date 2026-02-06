@@ -8,14 +8,33 @@ const disabledColour = "bg-gray-600";
 let guessNum = 0;
 let currentGuessArr = [];
 
+const executeWithLoadingSpinner = (callback, ...args) => {
+    const loadingSpinner = document.querySelector("#loading-spinner");
+    loadingSpinner.classList.remove("hidden");
+    setTimeout(() => {
+        callback(...args);
+        loadingSpinner.classList.add("hidden");
+    }, 10);
+};
+
 const showErrorPopup = (msg) => {
     document.querySelector("#game-error-inner").innerHTML = msg;
     document.querySelector("#game-error-outer").classList.remove("hidden");
 };
 
+const hideErrorPopup = () => {
+    document.querySelector("#game-error-inner").innerHTML = "";
+    document.querySelector("#game-error-outer").classList.add("hidden");
+};
+
 const showGameCompletePopup = (msg) => {
     document.querySelector("#game-complete-inner").innerHTML = msg;
     document.querySelector("#game-complete-outer").classList.remove("hidden");
+};
+
+const hideGameCompletePopup = () => {
+    document.querySelector("#game-complete-inner").innerHTML = "";
+    document.querySelector("#game-complete-outer").classList.add("hidden");
 };
 
 const shakeActiveLetterPanels = () => {
@@ -50,7 +69,20 @@ const removeOpacity = (elem) => {
     });
 };
 
-const populateRowPanels = () => {
+const resetRowPanels = () => {
+    const rows = document.querySelectorAll(".game-row");
+    rows.forEach((row) => {
+        const letterPanels = row.querySelectorAll(".letter-panel");
+        letterPanels.forEach((panel) => {
+            removeBgColours(panel);
+            removeOpacity(panel);
+            panel.classList.add(disabledColour);
+            panel.innerHTML = "";
+        });
+    });
+};
+
+const updateRowPanels = () => {
     const rows = document.querySelectorAll(".game-row");
     const rowIdxPattern = /^game-row-(\d+)$/;
     rows.forEach((row) => {
@@ -121,11 +153,7 @@ const updateRows = (suggestions) => {
                     );
                     return;
                 }
-                const loadingSpinner =
-                    document.querySelector("#loading-spinner");
-                loadingSpinner.classList.remove("hidden");
-                // set timeout allows the removal of the loadingSpinner again
-                setTimeout(() => {
+                executeWithLoadingSpinner(() => {
                     suggestions = guessHelper.getSuggestions(
                         guess,
                         colourPattern
@@ -134,20 +162,17 @@ const updateRows = (suggestions) => {
                         showErrorPopup(
                             "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
                         );
-                        loadingSpinner.classList.add("hidden");
                         return;
                     } else if (suggestions.length == 1) {
                         showGameCompletePopup(
                             `The correct answer is <b>${suggestions[0]}</b>`
                         );
-                        loadingSpinner.classList.add("hidden");
                         return;
                     }
                     guessNum++;
                     updateRows(suggestions, guessNum);
-                    loadingSpinner.classList.add("hidden");
                     btn.remove();
-                }, 10);
+                });
             });
             const selector = document.createElement("select");
             selector.classList.add(
@@ -173,7 +198,7 @@ const updateRows = (suggestions) => {
                 const selectedValue =
                     selector.options[selector.selectedIndex].value;
                 currentGuessArr = selectedValue.toUpperCase().split("");
-                populateRowPanels();
+                updateRowPanels();
             };
             selector.addEventListener("change", suggestionOnChange);
             sidePanel.replaceChildren(selector, submitBtn);
@@ -227,7 +252,7 @@ const handlePressKey = (key) => {
                 currentGuessArr.push(char);
             }
         }
-        populateRowPanels();
+        updateRowPanels();
     }
 };
 
@@ -266,8 +291,20 @@ backspaceKey.addEventListener("click", () => {
     handlePressKey("Backspace");
 });
 
+const restartGame = () => {
+    executeWithLoadingSpinner(() => {
+        resetGuessHelper();
+        guessNum = 0;
+        currentGuessArr = [];
+        resetRowPanels();
+        updateRows(optimalFirstGuesses);
+        hideGameCompletePopup();
+        hideErrorPopup();
+    });
+};
+
 document.querySelector("#restart-btn").addEventListener("click", () => {
-    window.location.reload();
+    restartGame();
 });
 
 window.mainJsInit = () => {
