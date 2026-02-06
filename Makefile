@@ -13,6 +13,7 @@ static:
 	npx @tailwindcss/cli -i ./web/static/input.css -o ./dist/main.css
 	cp web/static/index.html dist/
 	cp web/static/main.js dist/
+	cp web/static/favicon.ico dist/
 
 build: newdist data wasm static
 	@echo "Build complete - populated into dist/"
