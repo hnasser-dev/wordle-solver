@@ -8,10 +8,6 @@ import (
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
-// var possibleAnswers []string
-// var validGuesses []string
-// var freqMap words.WordFrequencyMap
-
 func sliceToJsArray[T any](s []T) js.Value {
 	arr := make([]any, len(s))
 	for i, v := range s {
@@ -92,6 +88,17 @@ func main() {
 
 	jsGuessHelper.Set("getSuggestions", getSuggestions)
 	js.Global().Set("guessHelper", jsGuessHelper)
+
+	resetGuessHelper := js.FuncOf(func(_ js.Value, args []js.Value) any {
+		gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
+		if err != nil {
+			js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
+		}
+		guessHelper = gh
+		return nil
+	})
+
+	js.Global().Set("resetGuessHelper", resetGuessHelper)
 
 	select {}
 }

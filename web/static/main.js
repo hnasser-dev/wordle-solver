@@ -13,9 +13,19 @@ const showErrorPopup = (msg) => {
     document.querySelector("#game-error-outer").classList.remove("hidden");
 };
 
+const hideErrorPopup = () => {
+    document.querySelector("#game-error-inner").innerHTML = "";
+    document.querySelector("#game-error-outer").classList.add("hidden");
+};
+
 const showGameCompletePopup = (msg) => {
     document.querySelector("#game-complete-inner").innerHTML = msg;
     document.querySelector("#game-complete-outer").classList.remove("hidden");
+};
+
+const hideGameCompletePopup = () => {
+    document.querySelector("#game-complete-inner").innerHTML = "";
+    document.querySelector("#game-complete-outer").classList.add("hidden");
 };
 
 const shakeActiveLetterPanels = () => {
@@ -50,7 +60,20 @@ const removeOpacity = (elem) => {
     });
 };
 
-const populateRowPanels = () => {
+const resetRowPanels = () => {
+    const rows = document.querySelectorAll(".game-row");
+    rows.forEach((row) => {
+        const letterPanels = row.querySelectorAll(".letter-panel");
+        letterPanels.forEach((panel) => {
+            removeBgColours(panel);
+            removeOpacity(panel);
+            panel.classList.add(disabledColour);
+            panel.innerHTML = "";
+        });
+    });
+};
+
+const updateRowPanels = () => {
     const rows = document.querySelectorAll(".game-row");
     const rowIdxPattern = /^game-row-(\d+)$/;
     rows.forEach((row) => {
@@ -173,7 +196,7 @@ const updateRows = (suggestions) => {
                 const selectedValue =
                     selector.options[selector.selectedIndex].value;
                 currentGuessArr = selectedValue.toUpperCase().split("");
-                populateRowPanels();
+                updateRowPanels();
             };
             selector.addEventListener("change", suggestionOnChange);
             sidePanel.replaceChildren(selector, submitBtn);
@@ -227,7 +250,7 @@ const handlePressKey = (key) => {
                 currentGuessArr.push(char);
             }
         }
-        populateRowPanels();
+        updateRowPanels();
     }
 };
 
@@ -266,8 +289,23 @@ backspaceKey.addEventListener("click", () => {
     handlePressKey("Backspace");
 });
 
+const restartGame = () => {
+    const loadingSpinner = document.querySelector("#loading-spinner");
+    loadingSpinner.classList.remove("hidden");
+    setTimeout(() => {
+        resetGuessHelper();
+        guessNum = 0;
+        currentGuessArr = [];
+        resetRowPanels();
+        updateRows(optimalFirstGuesses);
+        hideGameCompletePopup();
+        hideErrorPopup();
+        loadingSpinner.classList.add("hidden");
+    }, 10);
+};
+
 document.querySelector("#restart-btn").addEventListener("click", () => {
-    window.location.reload();
+    restartGame();
 });
 
 window.mainJsInit = () => {
