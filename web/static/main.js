@@ -48,6 +48,7 @@ const showGameHelpPopup = () => {
 const hideGameHelpPopup = () => {
     const popup = document.querySelector("#game-help-outer");
     popup.classList.add("pointer-events-none", "opacity-0");
+    localStorage.setItem("seenHelpPopup", Date.now());
 };
 
 const shakeActiveLetterPanels = () => {
@@ -329,4 +330,8 @@ document
 window.mainJsInit = () => {
     // optimalFirstGuesses defined in wasm
     updateRows(optimalFirstGuesses);
+    const seenHelpPopup = localStorage.getItem("seenHelpPopup");
+    if (!seenHelpPopup) {
+        showGameHelpPopup();
+    }
 };
