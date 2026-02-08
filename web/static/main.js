@@ -12,7 +12,7 @@ let submittedGuesses = [];
 let submittedColourClasses = [];
 
 let activeGuessArr = [];
-let activeGuessColourArr = Array(5).fill(disabledColour);
+let activeGuessColourArr = Array(5).fill("bg-gray-50");
 
 const executeWithLoadingSpinner = (callback, ...args) => {
     const loadingSpinner = document.querySelector("#loading-spinner");
@@ -96,12 +96,13 @@ const renderAllRows = () => {
     // const activeRowIdx = guesses.length;
     rows.forEach((row) => {
         const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
-        updateRowLetterPanels(rowIdx);
-        updateSidePanel(rowIdx);
+        updateRowLetterPanels(row, rowIdx);
+        updateSidePanel(row, rowIdx);
     });
 };
 
-const updateRowLetterPanels = (rowIdx) => {
+const updateRowLetterPanels = (row, rowIdx) => {
+    console.log(typeof row);
     const letterPanels = row.querySelectorAll(".letter-panel");
     const isActiveRow = rowIdx === submittedGuesses.length;
     letterPanels.forEach((panel, panelIdx) => {
@@ -126,21 +127,21 @@ const updateRowLetterPanels = (rowIdx) => {
     });
 };
 
-const updateSidePanel = (rowIdx) => {
+const updateSidePanel = (row, rowIdx) => {
     const rowSidePanel = row.querySelector(".row-side-panel");
     if (rowIdx === submittedGuesses.length) {
         rowSidePanel.replaceChildren(
-            createSelector(rowIdx, suggestedWords),
+            createSelector(row, rowIdx),
             createSubmitBtn()
         );
     } else if (rowIdx === submittedGuesses.length - 1) {
-        rowSidePanel.replaceChildren(createUndoGuessBtn());
+        rowSidePanel.replaceChildren(createUndoGuessBtn(rowSidePanel));
     } else {
         rowSidePanel.innerHTML = "";
     }
 };
 
-const createSelector = (rowIdx, suggestedWords) => {
+const createSelector = (row, rowIdx) => {
     const selector = document.createElement("select");
     selector.classList.add(
         "w-20",
@@ -164,13 +165,13 @@ const createSelector = (rowIdx, suggestedWords) => {
     const selectorOnChange = () => {
         const selectedValue = selector.options[selector.selectedIndex].value;
         activeGuessArr = selectedValue.toUpperCase().split("");
-        updateRowLetterPanels(rowIdx);
+        updateRowLetterPanels(row, rowIdx);
     };
     selector.addEventListener("change", selectorOnChange);
-    sidePanel.replaceChildren(selector, submitBtn);
     // force default value to populate the dropdown first
     if (suggestedWords.length > 0) {
-        selector.value = suggestions[0];
+        console.log("suggested words:", suggestedWords, suggestedWords.length);
+        selector.value = suggestedWords[0];
         selectorOnChange();
     }
     return selector;
@@ -211,9 +212,11 @@ const createSubmitBtn = () => {
             shakeActiveLetterPanels();
             return;
         }
-        const colourPattern = activeGuessColourArr.map(
-            (val) => colourClassMapping[val]
+        console.log("activeGuessColourArr:", activeGuessColourArr);
+        const colourPattern = activeGuessColourArr.map((val) =>
+            colourClassMapping.get(val)
         );
+        console.log("colourPattern:", colourPattern);
         if (colourPattern.every((val) => val === "green")) {
             showGameCompletePopup(
                 `Congratulations! The correct answer is <b>${guess}</b>`
@@ -221,9 +224,14 @@ const createSubmitBtn = () => {
             return;
         }
         executeWithLoadingSpinner(() => {
+            console.log("guess:", guess, "colourPattern:", colourPattern);
             suggestedWords = guessHelper.getSuggestedWords(
                 guess,
                 colourPattern
+            );
+            console.log(
+                "retrieved suggested words length",
+                suggestedWords.length
             );
             if (!suggestedWords || suggestedWords.length == 0) {
                 showErrorPopup(
@@ -240,14 +248,14 @@ const createSubmitBtn = () => {
             submittedGuesses.push(guess);
             submittedColourClasses.push(activeGuessColourArr);
             activeGuessArr = suggestedWords[0].split("");
-            activeGuessColourArr = Array(5).fill(disabledColour);
+            activeGuessColourArr = Array(5).fill("bg-gray-50");
             renderAllRows();
         });
     });
     return submitBtn;
 };
 
-const createUndoGuessBtn = () => {
+const createUndoGuessBtn = (rowSidePanel) => {
     const undoGuessBtn = document.createElement("button");
     undoGuessBtn.id = "undo-guess-btn";
     undoGuessBtn.innerHTML = "&#9100;";
@@ -268,8 +276,8 @@ const createUndoGuessBtn = () => {
         guessHelper.undoLastGuess();
         submittedGuesses = guessHelper.guesses();
     });
-    sidePanel.classList.toggle("justify-start");
-    return sidePanel;
+    rowSidePanel.classList.toggle("justify-start");
+    return undoGuessBtn;
 };
 
 const handlePressKey = (key) => {
@@ -307,9 +315,9 @@ const letterPanels = document.querySelectorAll(".letter-panel");
 letterPanels.forEach((panel) => {
     panel.addEventListener("click", () => {
         for (let i = 0; i < colourClasses.length; i++) {
-            const cls = colourClasses[i][0];
+            const cls = colourClasses[i];
             if (panel.classList.contains(cls)) {
-                nextCls = colourClasses[(i + 1) % colourClasses.length][0];
+                nextCls = colourClasses[(i + 1) % colourClasses.length];
                 panel.classList.toggle(cls);
                 panel.classList.toggle(nextCls);
                 break;
@@ -355,6 +363,7 @@ document
 window.mainJsInit = () => {
     // optimalFirstGuesses defined in wasm
     suggestedWords = optimalFirstGuesses;
+    console.log(suggestedWords);
     renderAllRows();
     const seenHelpPopup = localStorage.getItem("seenHelpPopup");
     if (!seenHelpPopup) {
