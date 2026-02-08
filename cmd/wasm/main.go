@@ -77,7 +77,7 @@ func main() {
 		if err != nil {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse colour strings: %s", err))
 		}
-		guessHelper.FilterRemainingWords(guess, colourPattern)
+		guessHelper.MakeGuess(guess, colourPattern)
 		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(gameMode)
 		returnArr := js.Global().Get("Array").New()
 		for _, guessOutcome := range sortedGuessOutcomes {

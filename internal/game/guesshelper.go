@@ -19,17 +19,18 @@ type GuessHelperConfig struct {
 }
 
 type GuessHelper struct {
-	FreqMap        words.WordFrequencyMap
-	RemainingWords []string
+	FreqMap   words.WordFrequencyMap
+	Guesses   []string
+	WordLists [][]string // length: len(Guesses) + 1
 }
 
 func NewGuessHelper(config GuessHelperConfig) (*GuessHelper, error) {
 	var err error
-	var remainingWords []string
+	var initialWordList []string
 	if config.WordList == nil {
-		remainingWords = words.GetPossibleAnswers()
+		initialWordList = words.GetPossibleAnswers()
 	} else {
-		remainingWords = append([]string{}, config.WordList...) // copy
+		initialWordList = append([]string{}, config.WordList...) // copy
 	}
 	freqMap := words.WordFrequencyMap{}
 	if config.FreqMap == nil {
@@ -40,17 +41,20 @@ func NewGuessHelper(config GuessHelperConfig) (*GuessHelper, error) {
 	} else {
 		maps.Copy(freqMap, config.FreqMap)
 	}
-	guessHelper := GuessHelper{FreqMap: freqMap, RemainingWords: remainingWords}
+	guessHelper := GuessHelper{FreqMap: freqMap, WordLists: [][]string{initialWordList}}
 	return &guessHelper, nil
 }
 
-func (g *GuessHelper) FilterRemainingWords(guess string, pattern colourPattern) {
-	guessDistribution := computeGuessDistribution(guess, g.RemainingWords)
-	g.RemainingWords = guessDistribution[pattern]
+func (g *GuessHelper) MakeGuess(guess string, pattern colourPattern) {
+	remainingWords := g.WordLists[len(g.Guesses)]
+	guessDistribution := computeGuessDistribution(guess, remainingWords)
+	g.WordLists = append(g.WordLists, guessDistribution[pattern])
+	g.Guesses = append(g.Guesses, guess)
 }
 
 func (g *GuessHelper) GetSortedGuessOutcomes(gameMode GameMode) []guessOutcome {
-	sortedGuessOutcomes := getSortedGuessOutcomes(g.RemainingWords, g.FreqMap)
+	remainingWords := g.WordLists[len(g.Guesses)]
+	sortedGuessOutcomes := getSortedGuessOutcomes(remainingWords, g.FreqMap)
 	switch gameMode {
 	case DumbMode:
 		slices.Reverse(sortedGuessOutcomes)
