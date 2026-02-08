@@ -37,6 +37,19 @@ const hideGameCompletePopup = () => {
     document.querySelector("#game-complete-outer").classList.add("hidden");
 };
 
+const showGameHelpPopup = () => {
+    const popup = document.querySelector("#game-help-outer");
+    popup.classList.remove("pointer-events-none");
+    requestAnimationFrame(() => {
+        popup.classList.remove("opacity-0");
+    });
+};
+
+const hideGameHelpPopup = () => {
+    const popup = document.querySelector("#game-help-outer");
+    popup.classList.add("pointer-events-none", "opacity-0");
+};
+
 const shakeActiveLetterPanels = () => {
     const activeLetterPanels = document
         .querySelector(`#game-row-${guessNum}`)
@@ -303,9 +316,15 @@ const restartGame = () => {
     });
 };
 
-document.querySelector("#restart-btn").addEventListener("click", () => {
-    restartGame();
-});
+document.querySelector("#restart-btn").addEventListener("click", restartGame);
+
+document
+    .querySelector("#game-help-close")
+    .addEventListener("click", hideGameHelpPopup);
+
+document
+    .querySelector("#help-icon-btn")
+    .addEventListener("click", showGameHelpPopup);
 
 window.mainJsInit = () => {
     // optimalFirstGuesses defined in wasm
