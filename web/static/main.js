@@ -5,7 +5,7 @@ const colourClasses = [
 ];
 const disabledColour = "bg-gray-600";
 
-let guessNum = 0;
+let guesses = [];
 let currentGuessArr = [];
 
 const executeWithLoadingSpinner = (callback, ...args) => {
@@ -53,7 +53,7 @@ const hideGameHelpPopup = () => {
 
 const shakeActiveLetterPanels = () => {
     const activeLetterPanels = document
-        .querySelector(`#game-row-${guessNum}`)
+        .querySelector(`#game-row-${guesses.length}`)
         .querySelectorAll(".letter-panel");
     activeLetterPanels.forEach((panel) => {
         panel.classList.add("shake");
@@ -102,7 +102,7 @@ const updateRowPanels = () => {
     rows.forEach((row) => {
         const letterPanels = row.querySelectorAll(".letter-panel");
         const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
-        if (rowIdx === guessNum) {
+        if (rowIdx === guesses.length) {
             for (let i = 0; i < letterPanels.length; i++) {
                 const panel = letterPanels[i];
                 removeBgColours(panel);
@@ -113,7 +113,7 @@ const updateRowPanels = () => {
                     panel.innerHTML = "";
                 }
             }
-        } else if (rowIdx === guessNum - 1) {
+        } else if (rowIdx === guesses.length - 1) {
             for (const elem of letterPanels) {
                 removeOpacity(elem);
                 elem.classList.add("opacity-50");
@@ -126,7 +126,7 @@ const updateRows = (suggestions) => {
     const rowSidePanels = document.querySelectorAll(".row-side-panel");
     rowSidePanels.forEach((sidePanel, idx) => {
         // previous row
-        if (idx == guessNum - 1) {
+        if (idx == guesses.length - 1) {
             const undoGuessBtn = document.createElement("button");
             undoGuessBtn.id = "undo-guess-btn";
             undoGuessBtn.innerHTML = "&#9100;";
@@ -145,12 +145,14 @@ const updateRows = (suggestions) => {
             );
             undoGuessBtn.addEventListener("click", () => {
                 guessHelper.undoLastGuess();
-                updateRows(); // TODO - fix
-                console.log("hi!");
+                // updateRows(); // TODO - fix
+                console.log("num guesses before:", guesses.length);
+                guesses = guessHelper.guesses();
+                console.log("num guesses after:", guesses.length);
             });
             sidePanel.classList.toggle("justify-start");
             sidePanel.replaceChildren(undoGuessBtn);
-        } else if (idx == guessNum) {
+        } else if (idx == guesses.length) {
             const submitBtn = document.createElement("button");
             submitBtn.id = "submit-guess-btn";
             submitBtn.innerHTML = "Submit";
@@ -177,7 +179,7 @@ const updateRows = (suggestions) => {
             );
             submitBtn.addEventListener("click", (event) => {
                 btn = event.currentTarget;
-                if (guessNum > 5 || currentGuessArr.length != 5) {
+                if (guesses.length > 5 || currentGuessArr.length != 5) {
                     return;
                 }
                 const guess = currentGuessArr.join("").toLowerCase();
@@ -185,7 +187,7 @@ const updateRows = (suggestions) => {
                     shakeActiveLetterPanels();
                     return;
                 }
-                const colourPattern = getColourPattern(guessNum);
+                const colourPattern = getColourPattern(guesses.length);
                 if (colourPattern.every((val) => val === "green")) {
                     showGameCompletePopup(
                         `Congratulations! The correct answer is <b>${guess}</b>`
@@ -208,8 +210,8 @@ const updateRows = (suggestions) => {
                         );
                         return;
                     }
-                    guessNum++;
-                    updateRows(suggestions, guessNum);
+                    guesses.push(guess);
+                    updateRows(suggestions, guesses.length);
                     btn.remove();
                 });
             });
@@ -333,7 +335,7 @@ backspaceKey.addEventListener("click", () => {
 const restartGame = () => {
     executeWithLoadingSpinner(() => {
         resetGuessHelper();
-        guessNum = 0;
+        guesses = [];
         currentGuessArr = [];
         resetRowPanels();
         updateRows(optimalFirstGuesses);
@@ -342,11 +344,11 @@ const restartGame = () => {
     });
 };
 
-const undoLastGuess = () => {
-    guessHelper.undoLastGuess();
-    guessNum = guessHelper.numGuesses();
-    console.log(`undid last guess, guessNum: ${guessNum}`);
-};
+// const undoLastGuess = () => {
+//     guessHelper.undoLastGuess();
+//     guesses = guessHelper.guesses();
+//     console.log("undid last guess");
+// };
 
 document.querySelector("#restart-btn").addEventListener("click", restartGame);
 

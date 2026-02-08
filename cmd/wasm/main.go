@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"syscall/js"
 
 	"github.com/hnasser-dev/wordle-solver/internal/game"
@@ -78,6 +79,7 @@ func main() {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse colour strings: %s", err))
 		}
 		guessHelper.MakeGuess(guess, colourPattern)
+		log.Printf("guesses: %s", guessHelper.Guesses)
 		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(gameMode)
 		returnArr := js.Global().Get("Array").New()
 		for _, guessOutcome := range sortedGuessOutcomes {
@@ -86,8 +88,12 @@ func main() {
 		return returnArr
 	})
 
-	jsGuessHelper.Set("numGuesses", js.FuncOf(func(_ js.Value, args []js.Value) any {
-		return js.ValueOf(len(guessHelper.Guesses))
+	jsGuessHelper.Set("guesses", js.FuncOf(func(_ js.Value, args []js.Value) any {
+		jsGuesses := js.Global().Get("Array").New()
+		for _, guess := range guessHelper.Guesses {
+			jsGuesses.Call("push", guess)
+		}
+		return jsGuesses
 	}))
 	jsGuessHelper.Set("getSuggestions", getSuggestions)
 	jsGuessHelper.Set("undoLastGuess", js.FuncOf(func(_ js.Value, args []js.Value) any {
