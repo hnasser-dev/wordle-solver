@@ -125,7 +125,32 @@ const updateRowPanels = () => {
 const updateRows = (suggestions) => {
     const rowSidePanels = document.querySelectorAll(".row-side-panel");
     rowSidePanels.forEach((sidePanel, idx) => {
-        if (idx == guessNum) {
+        // previous row
+        if (idx == guessNum - 1) {
+            const undoGuessBtn = document.createElement("button");
+            undoGuessBtn.id = "undo-guess-btn";
+            undoGuessBtn.innerHTML = "&#9100;";
+            undoGuessBtn.classList.add(
+                "text-white",
+                "text-2xl",
+                "md:text-3xl",
+                "p-2",
+                "ml-1",
+                "text-sm",
+                "md:text-md",
+                "font-bold",
+                "cursor-pointer",
+                "active:translate-y-0.5",
+                "active:shadow-inner"
+            );
+            undoGuessBtn.addEventListener("click", () => {
+                guessHelper.undoLastGuess();
+                updateRows(); // TODO - fix
+                console.log("hi!");
+            });
+            sidePanel.classList.toggle("justify-start");
+            sidePanel.replaceChildren(undoGuessBtn);
+        } else if (idx == guessNum) {
             const submitBtn = document.createElement("button");
             submitBtn.id = "submit-guess-btn";
             submitBtn.innerHTML = "Submit";
@@ -146,7 +171,7 @@ const updateRows = (suggestions) => {
                 "font-bold",
                 "text-center",
                 "rounded-md",
-                "hover:cursor-pointer",
+                "cursor-pointer",
                 "active:translate-y-0.5",
                 "active:shadow-inner"
             );
@@ -317,6 +342,12 @@ const restartGame = () => {
     });
 };
 
+const undoLastGuess = () => {
+    guessHelper.undoLastGuess();
+    guessNum = guessHelper.numGuesses();
+    console.log(`undid last guess, guessNum: ${guessNum}`);
+};
+
 document.querySelector("#restart-btn").addEventListener("click", restartGame);
 
 document
@@ -334,4 +365,5 @@ window.mainJsInit = () => {
     if (!seenHelpPopup) {
         showGameHelpPopup();
     }
+    console.log("guessHelper numGuesses:", guessHelper.guesses());
 };

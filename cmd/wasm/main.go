@@ -86,7 +86,16 @@ func main() {
 		return returnArr
 	})
 
+	jsGuessHelper.Set("numGuesses", js.FuncOf(func(_ js.Value, args []js.Value) any {
+		return js.ValueOf(len(guessHelper.Guesses))
+	}))
 	jsGuessHelper.Set("getSuggestions", getSuggestions)
+	jsGuessHelper.Set("undoLastGuess", js.FuncOf(func(_ js.Value, args []js.Value) any {
+		if err := guessHelper.RevertLastGuess(); err != game.ErrNoGuesses {
+			return js.Global().Get("Error").New(fmt.Sprintf("unable to revert last guess - err: %s", err))
+		}
+		return nil
+	}))
 	js.Global().Set("guessHelper", jsGuessHelper)
 
 	resetGuessHelper := js.FuncOf(func(_ js.Value, args []js.Value) any {

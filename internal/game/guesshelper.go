@@ -6,12 +6,15 @@ The game's answer is NOT known ahead of time
 package game
 
 import (
+	"errors"
 	"fmt"
 	"maps"
 	"slices"
 
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
+
+var ErrNoGuesses = errors.New("no guesses have been made")
 
 type GuessHelperConfig struct {
 	WordList []string
@@ -64,4 +67,13 @@ func (g *GuessHelper) GetSortedGuessOutcomes(gameMode GameMode) []guessOutcome {
 		panic(fmt.Sprintf("unknown gameMode: %d", gameMode))
 	}
 	return sortedGuessOutcomes
+}
+
+func (g *GuessHelper) RevertLastGuess() error {
+	if len(g.Guesses) == 0 {
+		return ErrNoGuesses
+	}
+	g.Guesses = g.Guesses[:len(g.Guesses)-1]
+	g.WordLists = g.WordLists[:len(g.WordLists)-1]
+	return nil
 }
