@@ -6,6 +6,7 @@ const colourClasses = [
 const disabledColour = "bg-gray-600";
 
 let guesses = [];
+let colourPatterns = [];
 let currentGuessArr = [];
 
 const executeWithLoadingSpinner = (callback, ...args) => {
@@ -79,6 +80,52 @@ const removeOpacity = (elem) => {
     [...elem.classList].forEach((cls) => {
         if (cls.startsWith("opacity-")) {
             elem.classList.remove(cls);
+        }
+    });
+};
+
+/*
+Two functions:
+
+- One that runs when a letter is changed
+- One that runs on submit or on reset or on undo
+
+
+When letter is changed:
+- Should only affect the current row
+
+
+On submit:
+- Rerender ALL rows
+    - On rowIdx == guessNum: white bg, 
+
+
+
+
+*/
+
+//
+const updateLetterPanelsActiveRow = () => {
+    const activeRow = document.querySelector(`#game-row-${guesses.length - 1}`);
+    const letterPanels = activeRow.querySelectorAll(".letter-panel");
+    letterPanels.forEach((panel, idx) => {
+        if (idx >= guesses.length) {
+            return;
+        }
+        panel.innerHTML = currentGuessArr[idx];
+    });
+};
+
+// overall rerender of ALL rows
+const rerenderAllRows = () => {
+    const rows = document.querySelectorAll(".game-row");
+    const rowIdxPattern = /^game-row-(\d+)$/;
+    const activeRowIdx = guesses.length;
+    rows.forEach((row) => {
+        const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
+
+        // future row, render as inactive
+        if (rowIdx > activeRowIdx) {
         }
     });
 };
