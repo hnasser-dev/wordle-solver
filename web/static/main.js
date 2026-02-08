@@ -311,6 +311,7 @@ document.addEventListener("keydown", (event) => {
     handlePressKey(event.key);
 });
 
+// TODO - continue from here, and testing in the browser
 const letterPanels = document.querySelectorAll(".letter-panel");
 letterPanels.forEach((panel) => {
     panel.addEventListener("click", () => {
