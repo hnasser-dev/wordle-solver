@@ -1,13 +1,18 @@
-const colourClasses = [
+const colourClasses = ["bg-gray-50", "bg-orange-200", "bg-green-500"];
+const colourClassMapping = new Map([
     ["bg-gray-50", "grey"],
     ["bg-orange-200", "yellow"],
     ["bg-green-500", "green"],
-];
+]);
 const disabledColour = "bg-gray-600";
 
-let guesses = [];
-let colourPatterns = [];
-let currentGuessArr = [];
+let suggestedWords = [];
+
+let submittedGuesses = [];
+let submittedColourClasses = [];
+
+let activeGuessArr = [];
+let activeGuessColourArr = Array(5).fill(disabledColour);
 
 const executeWithLoadingSpinner = (callback, ...args) => {
     const loadingSpinner = document.querySelector("#loading-spinner");
@@ -54,7 +59,7 @@ const hideGameHelpPopup = () => {
 
 const shakeActiveLetterPanels = () => {
     const activeLetterPanels = document
-        .querySelector(`#game-row-${guesses.length}`)
+        .querySelector(`#game-row-${submittedGuesses.length}`)
         .querySelectorAll(".letter-panel");
     activeLetterPanels.forEach((panel) => {
         panel.classList.add("shake");
@@ -84,246 +89,187 @@ const removeOpacity = (elem) => {
     });
 };
 
-/*
-Two functions:
+// overall rerender of ALL rows
+const renderAllRows = () => {
+    const rows = document.querySelectorAll(".game-row");
+    const rowIdxPattern = /^game-row-(\d+)$/;
+    // const activeRowIdx = guesses.length;
+    rows.forEach((row) => {
+        const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
+        updateRowLetterPanels(rowIdx);
+        updateSidePanel(rowIdx);
+    });
+};
 
-- One that runs when a letter is changed
-- One that runs on submit or on reset or on undo
+const updateRowLetterPanels = (rowIdx) => {
+    const letterPanels = row.querySelectorAll(".letter-panel");
+    const isActiveRow = rowIdx === submittedGuesses.length;
+    letterPanels.forEach((panel, panelIdx) => {
+        removeBgColours(panel);
+        removeOpacity(panel);
+        if (isActiveRow) {
+            panel.innerHTML =
+                panelIdx < activeGuessArr.length
+                    ? activeGuessArr[panelIdx]
+                    : "";
+            panel.classList.add(activeGuessColourArr[panelIdx]);
+        } else if (rowIdx < submittedGuesses.length) {
+            const word = submittedGuesses[rowIdx];
+            const colourClasses = submittedColourClasses[rowIdx];
+            panel.innerHTML = word[panelIdx];
+            panel.classList.add("opacity-50");
+            panel.classList.add(colourClasses[panelIdx]);
+        } else {
+            panel.innerHTML = "";
+            panel.classList.add(disabledColour);
+        }
+    });
+};
 
+const updateSidePanel = (rowIdx) => {
+    const rowSidePanel = row.querySelector(".row-side-panel");
+    if (rowIdx === submittedGuesses.length) {
+        rowSidePanel.replaceChildren(
+            createSelector(rowIdx, suggestedWords),
+            createSubmitBtn()
+        );
+    } else if (rowIdx === submittedGuesses.length - 1) {
+        rowSidePanel.replaceChildren(createUndoGuessBtn());
+    } else {
+        rowSidePanel.innerHTML = "";
+    }
+};
 
-When letter is changed:
-- Should only affect the current row
+const createSelector = (rowIdx, suggestedWords) => {
+    const selector = document.createElement("select");
+    selector.classList.add(
+        "w-20",
+        "sm:w-24",
+        "md:w-28",
+        "border",
+        "h-11",
+        "sm:h-14",
+        "md:h-16",
+        "bg-sky-300",
+        "text-md",
+        "md:text-lg",
+        "font-bold",
+        "uppercase",
+        "text-center",
+        "rounded-md"
+    );
+    for (const word of suggestedWords) {
+        selector.add(new Option(word.toUpperCase(), word));
+    }
+    const selectorOnChange = () => {
+        const selectedValue = selector.options[selector.selectedIndex].value;
+        activeGuessArr = selectedValue.toUpperCase().split("");
+        updateRowLetterPanels(rowIdx);
+    };
+    selector.addEventListener("change", selectorOnChange);
+    sidePanel.replaceChildren(selector, submitBtn);
+    // force default value to populate the dropdown first
+    if (suggestedWords.length > 0) {
+        selector.value = suggestions[0];
+        selectorOnChange();
+    }
+    return selector;
+};
 
-
-On submit:
-- Rerender ALL rows
-    - On rowIdx == guessNum: white bg, 
-
-
-
-
-*/
-
-//
-const updateLetterPanelsActiveRow = () => {
-    const activeRow = document.querySelector(`#game-row-${guesses.length - 1}`);
-    const letterPanels = activeRow.querySelectorAll(".letter-panel");
-    letterPanels.forEach((panel, idx) => {
-        if (idx >= guesses.length) {
+const createSubmitBtn = () => {
+    const submitBtn = document.createElement("button");
+    submitBtn.id = "submit-guess-btn";
+    submitBtn.innerHTML = "Submit";
+    submitBtn.classList.add(
+        "w-16",
+        "sm:w-18",
+        "md:w-20",
+        "h-11",
+        "sm:h-14",
+        "md:h-16",
+        "border",
+        "bg-lime-200",
+        "block",
+        "border",
+        "border-default-medium",
+        "text-sm",
+        "md:text-md",
+        "font-bold",
+        "text-center",
+        "rounded-md",
+        "cursor-pointer",
+        "active:translate-y-0.5",
+        "active:shadow-inner"
+    );
+    submitBtn.addEventListener("click", (event) => {
+        btn = event.currentTarget;
+        if (submittedGuesses.length > 5 || activeGuessArr.length != 5) {
             return;
         }
-        panel.innerHTML = currentGuessArr[idx];
-    });
-};
-
-const rerenderRow = (row, rowIdx, activeRowIdx) => {
-    if (rowIdx === activeRowIdx) {
-    } else if (rowIdx < activeRowIdx) {
-    } else if (rowIdx > activeRowIdx) {
-    }
-};
-
-// overall rerender of ALL rows
-const rerenderAllRows = () => {
-    const rows = document.querySelectorAll(".game-row");
-    const rowIdxPattern = /^game-row-(\d+)$/;
-    const activeRowIdx = guesses.length;
-    rows.forEach((row) => {
-        const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
-        rerenderRow(row, rowIdx, activeRowIdx);
-    });
-};
-
-const resetRowPanels = () => {
-    const rows = document.querySelectorAll(".game-row");
-    rows.forEach((row) => {
-        const letterPanels = row.querySelectorAll(".letter-panel");
-        letterPanels.forEach((panel) => {
-            removeBgColours(panel);
-            removeOpacity(panel);
-            panel.classList.add(disabledColour);
-            panel.innerHTML = "";
+        const guess = activeGuessArr.join("").toLowerCase();
+        if (!allValidGuessesList.has(guess)) {
+            shakeActiveLetterPanels();
+            return;
+        }
+        const colourPattern = activeGuessColourArr.map(
+            (val) => colourClassMapping[val]
+        );
+        if (colourPattern.every((val) => val === "green")) {
+            showGameCompletePopup(
+                `Congratulations! The correct answer is <b>${guess}</b>`
+            );
+            return;
+        }
+        executeWithLoadingSpinner(() => {
+            suggestedWords = guessHelper.getSuggestedWords(
+                guess,
+                colourPattern
+            );
+            if (!suggestedWords || suggestedWords.length == 0) {
+                showErrorPopup(
+                    "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
+                );
+                return;
+            } else if (suggestedWords.length == 1) {
+                showGameCompletePopup(
+                    `The correct answer is <b>${suggestedWords[0]}</b>`
+                );
+                return;
+            }
+            // reset global values and re-render rows
+            submittedGuesses.push(guess);
+            submittedColourClasses.push(activeGuessColourArr);
+            activeGuessArr = suggestedWords[0].split("");
+            activeGuessColourArr = Array(5).fill(disabledColour);
+            renderAllRows();
         });
     });
+    return submitBtn;
 };
 
-const updateRowPanels = () => {
-    const rows = document.querySelectorAll(".game-row");
-    const rowIdxPattern = /^game-row-(\d+)$/;
-    rows.forEach((row) => {
-        const letterPanels = row.querySelectorAll(".letter-panel");
-        const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
-        if (rowIdx === guesses.length) {
-            for (let i = 0; i < letterPanels.length; i++) {
-                const panel = letterPanels[i];
-                removeBgColours(panel);
-                panel.classList.add("bg-gray-50");
-                if (i < currentGuessArr.length) {
-                    panel.innerHTML = currentGuessArr[i];
-                } else {
-                    panel.innerHTML = "";
-                }
-            }
-        } else if (rowIdx === guesses.length - 1) {
-            for (const elem of letterPanels) {
-                removeOpacity(elem);
-                elem.classList.add("opacity-50");
-            }
-        }
+const createUndoGuessBtn = () => {
+    const undoGuessBtn = document.createElement("button");
+    undoGuessBtn.id = "undo-guess-btn";
+    undoGuessBtn.innerHTML = "&#9100;";
+    undoGuessBtn.classList.add(
+        "text-white",
+        "text-2xl",
+        "md:text-3xl",
+        "p-2",
+        "ml-1",
+        "text-sm",
+        "md:text-md",
+        "font-bold",
+        "cursor-pointer",
+        "active:translate-y-0.5",
+        "active:shadow-inner"
+    );
+    undoGuessBtn.addEventListener("click", () => {
+        guessHelper.undoLastGuess();
+        submittedGuesses = guessHelper.guesses();
     });
-};
-
-const updateRows = (suggestions) => {
-    const rowSidePanels = document.querySelectorAll(".row-side-panel");
-    rowSidePanels.forEach((sidePanel, idx) => {
-        // previous row
-        if (idx == guesses.length - 1) {
-            const undoGuessBtn = document.createElement("button");
-            undoGuessBtn.id = "undo-guess-btn";
-            undoGuessBtn.innerHTML = "&#9100;";
-            undoGuessBtn.classList.add(
-                "text-white",
-                "text-2xl",
-                "md:text-3xl",
-                "p-2",
-                "ml-1",
-                "text-sm",
-                "md:text-md",
-                "font-bold",
-                "cursor-pointer",
-                "active:translate-y-0.5",
-                "active:shadow-inner"
-            );
-            undoGuessBtn.addEventListener("click", () => {
-                guessHelper.undoLastGuess();
-                // updateRows(); // TODO - fix
-                console.log("num guesses before:", guesses.length);
-                guesses = guessHelper.guesses();
-                console.log("num guesses after:", guesses.length);
-            });
-            sidePanel.classList.toggle("justify-start");
-            sidePanel.replaceChildren(undoGuessBtn);
-        } else if (idx == guesses.length) {
-            const submitBtn = document.createElement("button");
-            submitBtn.id = "submit-guess-btn";
-            submitBtn.innerHTML = "Submit";
-            submitBtn.classList.add(
-                "w-16",
-                "sm:w-18",
-                "md:w-20",
-                "h-11",
-                "sm:h-14",
-                "md:h-16",
-                "border",
-                "bg-lime-200",
-                "block",
-                "border",
-                "border-default-medium",
-                "text-sm",
-                "md:text-md",
-                "font-bold",
-                "text-center",
-                "rounded-md",
-                "cursor-pointer",
-                "active:translate-y-0.5",
-                "active:shadow-inner"
-            );
-            submitBtn.addEventListener("click", (event) => {
-                btn = event.currentTarget;
-                if (guesses.length > 5 || currentGuessArr.length != 5) {
-                    return;
-                }
-                const guess = currentGuessArr.join("").toLowerCase();
-                if (!allValidGuessesList.has(guess)) {
-                    shakeActiveLetterPanels();
-                    return;
-                }
-                const colourPattern = getColourPattern(guesses.length);
-                if (colourPattern.every((val) => val === "green")) {
-                    showGameCompletePopup(
-                        `Congratulations! The correct answer is <b>${guess}</b>`
-                    );
-                    return;
-                }
-                executeWithLoadingSpinner(() => {
-                    suggestions = guessHelper.getSuggestions(
-                        guess,
-                        colourPattern
-                    );
-                    if (!suggestions || suggestions.length == 0) {
-                        showErrorPopup(
-                            "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
-                        );
-                        return;
-                    } else if (suggestions.length == 1) {
-                        showGameCompletePopup(
-                            `The correct answer is <b>${suggestions[0]}</b>`
-                        );
-                        return;
-                    }
-                    guesses.push(guess);
-                    updateRows(suggestions, guesses.length);
-                    btn.remove();
-                });
-            });
-            const selector = document.createElement("select");
-            selector.classList.add(
-                "w-20",
-                "sm:w-24",
-                "md:w-28",
-                "border",
-                "h-11",
-                "sm:h-14",
-                "md:h-16",
-                "bg-sky-300",
-                "text-md",
-                "md:text-lg",
-                "font-bold",
-                "uppercase",
-                "text-center",
-                "rounded-md"
-            );
-            for (const suggestion of suggestions) {
-                selector.add(new Option(suggestion.toUpperCase(), suggestion));
-            }
-            const suggestionOnChange = () => {
-                const selectedValue =
-                    selector.options[selector.selectedIndex].value;
-                currentGuessArr = selectedValue.toUpperCase().split("");
-                updateRowPanels();
-            };
-            selector.addEventListener("change", suggestionOnChange);
-            sidePanel.replaceChildren(selector, submitBtn);
-            // force default value to populate the dropdown first
-            if (suggestions.length > 0) {
-                selector.value = suggestions[0];
-                suggestionOnChange();
-            }
-        } else {
-            sidePanel.innerHTML = "";
-        }
-    });
-};
-
-const getColourPattern = (rowIdx) => {
-    const colourPattern = [];
-    const row = document.querySelector(`#game-row-${rowIdx}`);
-    const letterPanels = row.querySelectorAll(".letter-panel");
-    for (const panel of letterPanels) {
-        const classes = panel.classList;
-        let classFound = false;
-        for (const [cls, colour] of colourClasses) {
-            if (classes.contains(cls)) {
-                colourPattern.push(colour);
-                classFound = true;
-                break;
-            }
-        }
-        if (!classFound) {
-            throw new Error("panel has no class");
-        }
-    }
-    return colourPattern;
+    sidePanel.classList.toggle("justify-start");
+    return sidePanel;
 };
 
 const handlePressKey = (key) => {
@@ -335,16 +281,17 @@ const handlePressKey = (key) => {
             document.querySelector("#submit-guess-btn").click();
             return;
         } else if (isBackspace) {
-            if (currentGuessArr.length >= 1) {
-                currentGuessArr.pop();
+            if (activeGuessArr.length >= 1) {
+                activeGuessArr.pop();
             }
         } else {
             const char = key.toUpperCase();
-            if (currentGuessArr.length < 5) {
-                currentGuessArr.push(char);
+            if (activeGuessArr.length < 5) {
+                activeGuessArr.push(char);
             }
         }
-        updateRowPanels();
+        const activeRowIdx = submittedGuesses.length;
+        updateRowLetterPanels(activeRowIdx);
     }
 };
 
@@ -386,20 +333,14 @@ backspaceKey.addEventListener("click", () => {
 const restartGame = () => {
     executeWithLoadingSpinner(() => {
         resetGuessHelper();
-        guesses = [];
-        currentGuessArr = [];
+        submittedGuesses = [];
+        activeGuessArr = [];
         resetRowPanels();
         updateRows(optimalFirstGuesses);
         hideGameCompletePopup();
         hideErrorPopup();
     });
 };
-
-// const undoLastGuess = () => {
-//     guessHelper.undoLastGuess();
-//     guesses = guessHelper.guesses();
-//     console.log("undid last guess");
-// };
 
 document.querySelector("#restart-btn").addEventListener("click", restartGame);
 
@@ -413,7 +354,8 @@ document
 
 window.mainJsInit = () => {
     // optimalFirstGuesses defined in wasm
-    updateRows(optimalFirstGuesses);
+    suggestedWords = optimalFirstGuesses;
+    renderAllRows();
     const seenHelpPopup = localStorage.getItem("seenHelpPopup");
     if (!seenHelpPopup) {
         showGameHelpPopup();

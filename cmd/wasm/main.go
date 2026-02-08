@@ -56,10 +56,10 @@ func main() {
 	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
 
 	jsGuessHelper := js.Global().Get("Object").New()
-	// getSuggestions(guess string, colourPattern []string)
-	getSuggestions := js.FuncOf(func(_ js.Value, args []js.Value) any {
+	// getSuggestedWords(guess string, colourPattern []string)
+	getSuggestedWords := js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) != 2 {
-			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestions - must be 2")
+			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestedWords - must be 2")
 		}
 		guess := args[0].String()
 		jsColourStringsArr := args[1]
@@ -95,7 +95,7 @@ func main() {
 		}
 		return jsGuesses
 	}))
-	jsGuessHelper.Set("getSuggestions", getSuggestions)
+	jsGuessHelper.Set("getSuggestedWords", getSuggestedWords)
 	jsGuessHelper.Set("undoLastGuess", js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if err := guessHelper.RevertLastGuess(); err != game.ErrNoGuesses {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to revert last guess - err: %s", err))
