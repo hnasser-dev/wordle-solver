@@ -116,6 +116,13 @@ const updateLetterPanelsActiveRow = () => {
     });
 };
 
+const rerenderRow = (row, rowIdx, activeRowIdx) => {
+    if (rowIdx === activeRowIdx) {
+    } else if (rowIdx < activeRowIdx) {
+    } else if (rowIdx > activeRowIdx) {
+    }
+};
+
 // overall rerender of ALL rows
 const rerenderAllRows = () => {
     const rows = document.querySelectorAll(".game-row");
@@ -123,10 +130,7 @@ const rerenderAllRows = () => {
     const activeRowIdx = guesses.length;
     rows.forEach((row) => {
         const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
-
-        // future row, render as inactive
-        if (rowIdx > activeRowIdx) {
-        }
+        rerenderRow(row, rowIdx, activeRowIdx);
     });
 };
 
