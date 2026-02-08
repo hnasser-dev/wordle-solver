@@ -16,7 +16,6 @@ static:
 	cp web/static/main.js dist/
 	cp web/static/wasm_exec.js dist/
 	cp web/static/assets/favicon.ico dist/assets/
-	cp web/static/assets/help-icon.svg dist/assets/
 
 build: newdist data wasm styling static
 	@echo "Build complete - populated into dist/"
