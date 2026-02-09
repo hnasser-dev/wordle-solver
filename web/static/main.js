@@ -12,7 +12,7 @@ let submittedGuesses = [];
 let submittedColourClasses = [];
 
 let activeGuessArr = [];
-let activeGuessColourArr = Array(5).fill("bg-gray-50");
+let activeGuessColourClasses = Array(5).fill("bg-gray-50");
 
 const executeWithLoadingSpinner = (callback, ...args) => {
     const loadingSpinner = document.querySelector("#loading-spinner");
@@ -113,7 +113,7 @@ const updateRowLetterPanels = (row, rowIdx) => {
                 panelIdx < activeGuessArr.length
                     ? activeGuessArr[panelIdx]
                     : "";
-            panel.classList.add(activeGuessColourArr[panelIdx]);
+            panel.classList.add(activeGuessColourClasses[panelIdx]);
         } else if (rowIdx < submittedGuesses.length) {
             const word = submittedGuesses[rowIdx];
             const colourClasses = submittedColourClasses[rowIdx];
@@ -212,8 +212,8 @@ const createSubmitBtn = () => {
             shakeActiveLetterPanels();
             return;
         }
-        console.log("activeGuessColourArr:", activeGuessColourArr);
-        const colourPattern = activeGuessColourArr.map((val) =>
+        console.log("activeGuessColourArr:", activeGuessColourClasses);
+        const colourPattern = activeGuessColourClasses.map((val) =>
             colourClassMapping.get(val)
         );
         console.log("colourPattern:", colourPattern);
@@ -233,22 +233,30 @@ const createSubmitBtn = () => {
                 "retrieved suggested words length",
                 suggestedWords.length
             );
+            console.log("suggestedWords:", suggestedWords);
             if (!suggestedWords || suggestedWords.length == 0) {
                 showErrorPopup(
                     "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
                 );
+                console.log("no suggested words");
                 return;
             } else if (suggestedWords.length == 1) {
                 showGameCompletePopup(
                     `The correct answer is <b>${suggestedWords[0]}</b>`
                 );
+                console.log("one suggested word left");
                 return;
             }
             // reset global values and re-render rows
             submittedGuesses.push(guess);
-            submittedColourClasses.push(activeGuessColourArr);
+            submittedColourClasses.push([...activeGuessColourClasses]);
+            console.log("submittedColourClasses", submittedColourClasses);
             activeGuessArr = suggestedWords[0].split("");
-            activeGuessColourArr = Array(5).fill("bg-gray-50");
+            activeGuessColourClasses = Array(5).fill("bg-gray-50");
+            console.log(
+                "activeGuessColourClasses after filling",
+                activeGuessColourClasses
+            );
             renderAllRows();
         });
     });
@@ -311,19 +319,26 @@ document.addEventListener("keydown", (event) => {
     handlePressKey(event.key);
 });
 
-// TODO - continue from here, and testing in the browser
-const letterPanels = document.querySelectorAll(".letter-panel");
-letterPanels.forEach((panel) => {
-    panel.addEventListener("click", () => {
-        for (let i = 0; i < colourClasses.length; i++) {
-            const cls = colourClasses[i];
-            if (panel.classList.contains(cls)) {
-                nextCls = colourClasses[(i + 1) % colourClasses.length];
-                panel.classList.toggle(cls);
-                panel.classList.toggle(nextCls);
-                break;
+const rows = document.querySelectorAll(".game-row");
+rows.forEach((row) => {
+    const letterPanels = row.querySelectorAll(".letter-panel");
+    letterPanels.forEach((panel, panelIdx) => {
+        panel.addEventListener("click", () => {
+            for (let i = 0; i < colourClasses.length; i++) {
+                const cls = colourClasses[i];
+                if (panel.classList.contains(cls)) {
+                    nextCls = colourClasses[(i + 1) % colourClasses.length];
+                    panel.classList.toggle(cls);
+                    panel.classList.toggle(nextCls);
+                    activeGuessColourClasses[panelIdx] = nextCls;
+                    console.log(
+                        "updated panel in ACGC:",
+                        activeGuessColourClasses
+                    );
+                    break;
+                }
             }
-        }
+        });
     });
 });
 
