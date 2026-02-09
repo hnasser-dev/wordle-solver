@@ -159,11 +159,11 @@ const createSelector = (row, rowIdx) => {
         "rounded-md"
     );
     for (const word of suggestedWords) {
-        selector.add(new Option(word.toUpperCase(), word));
+        selector.add(new Option(word.toLowerCase(), word));
     }
     const selectorOnChange = () => {
         const selectedValue = selector.options[selector.selectedIndex].value;
-        activeGuessArr = selectedValue.toUpperCase().split("");
+        activeGuessArr = selectedValue.toLowerCase().split("");
         updateRowLetterPanels(row, rowIdx);
     };
     selector.addEventListener("change", selectorOnChange);
@@ -270,9 +270,13 @@ const createUndoGuessBtn = (rowSidePanel) => {
     undoGuessBtn.addEventListener("click", () => {
         // TODO -- fix this behaviour
         guessHelper.undoLastGuess();
+        console.log("activeGuessArr:", activeGuessArr);
+        console.log("activeGuessColourClasses:", activeGuessColourClasses);
         const activeGuessStr = submittedGuesses.pop();
         activeGuessArr = activeGuessStr.split("");
         activeGuessColourClasses = submittedColourClasses.pop();
+        console.log("activeGuessArr:", activeGuessArr);
+        console.log("activeGuessColourClasses:", activeGuessColourClasses);
         renderAllRows();
     });
     rowSidePanel.classList.toggle("justify-start");
@@ -292,7 +296,7 @@ const handlePressKey = (key) => {
                 activeGuessArr.pop();
             }
         } else {
-            const char = key.toUpperCase();
+            const char = key.toLowerCase();
             if (activeGuessArr.length < 5) {
                 activeGuessArr.push(char);
             }
