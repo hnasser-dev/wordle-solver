@@ -357,10 +357,13 @@ backspaceKey.addEventListener("click", () => {
 const restartGame = () => {
     executeWithLoadingSpinner(() => {
         resetGuessHelper();
+        suggestedWords = optimalFirstGuesses;
         submittedGuesses = [];
+        submittedColourClasses = [];
         activeGuessArr = [];
-        resetRowPanels();
-        updateRows(optimalFirstGuesses);
+        activeGuessColourClasses = Array(5).fill("bg-gray-50");
+        renderAllRows();
+        hideGameHelpPopup();
         hideGameCompletePopup();
         hideErrorPopup();
     });
