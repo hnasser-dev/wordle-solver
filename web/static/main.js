@@ -102,7 +102,6 @@ const renderAllRows = () => {
 };
 
 const updateRowLetterPanels = (row, rowIdx) => {
-    console.log(typeof row);
     const letterPanels = row.querySelectorAll(".letter-panel");
     const isActiveRow = rowIdx === submittedGuesses.length;
     letterPanels.forEach((panel, panelIdx) => {
@@ -212,11 +211,9 @@ const createSubmitBtn = () => {
             shakeActiveLetterPanels();
             return;
         }
-        console.log("activeGuessColourArr:", activeGuessColourClasses);
         const colourPattern = activeGuessColourClasses.map((val) =>
             colourClassMapping.get(val)
         );
-        console.log("colourPattern:", colourPattern);
         if (colourPattern.every((val) => val === "green")) {
             showGameCompletePopup(
                 `Congratulations! The correct answer is <b>${guess}</b>`
@@ -229,11 +226,6 @@ const createSubmitBtn = () => {
                 guess,
                 colourPattern
             );
-            console.log(
-                "retrieved suggested words length",
-                suggestedWords.length
-            );
-            console.log("suggestedWords:", suggestedWords);
             if (!suggestedWords || suggestedWords.length == 0) {
                 showErrorPopup(
                     "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
@@ -250,13 +242,8 @@ const createSubmitBtn = () => {
             // reset global values and re-render rows
             submittedGuesses.push(guess);
             submittedColourClasses.push([...activeGuessColourClasses]);
-            console.log("submittedColourClasses", submittedColourClasses);
             activeGuessArr = suggestedWords[0].split("");
             activeGuessColourClasses = Array(5).fill("bg-gray-50");
-            console.log(
-                "activeGuessColourClasses after filling",
-                activeGuessColourClasses
-            );
             renderAllRows();
         });
     });
@@ -281,8 +268,12 @@ const createUndoGuessBtn = (rowSidePanel) => {
         "active:shadow-inner"
     );
     undoGuessBtn.addEventListener("click", () => {
+        // TODO -- fix this behaviour
         guessHelper.undoLastGuess();
-        submittedGuesses = guessHelper.guesses();
+        const activeGuessStr = submittedGuesses.pop();
+        activeGuessArr = activeGuessStr.split("");
+        activeGuessColourClasses = submittedColourClasses.pop();
+        renderAllRows();
     });
     rowSidePanel.classList.toggle("justify-start");
     return undoGuessBtn;
