@@ -89,11 +89,14 @@ const removeOpacity = (elem) => {
     });
 };
 
+const getColourPatternFromClasses = (classes) => {
+    return classes.map((val) => colourClassMapping.get(val));
+};
+
 // overall rerender of ALL rows
 const renderAllRows = () => {
     const rows = document.querySelectorAll(".game-row");
     const rowIdxPattern = /^game-row-(\d+)$/;
-    // const activeRowIdx = guesses.length;
     rows.forEach((row) => {
         const rowIdx = parseInt(row.id.match(rowIdxPattern)[1]);
         updateRowLetterPanels(row, rowIdx);
@@ -169,7 +172,6 @@ const createSelector = (row, rowIdx) => {
     selector.addEventListener("change", selectorOnChange);
     // force default value to populate the dropdown first
     if (suggestedWords.length > 0) {
-        console.log("suggested words:", suggestedWords, suggestedWords.length);
         selector.value = suggestedWords[0];
         selectorOnChange();
     }
@@ -211,8 +213,8 @@ const createSubmitBtn = () => {
             shakeActiveLetterPanels();
             return;
         }
-        const colourPattern = activeGuessColourClasses.map((val) =>
-            colourClassMapping.get(val)
+        const colourPattern = getColourPatternFromClasses(
+            activeGuessColourClasses
         );
         if (colourPattern.every((val) => val === "green")) {
             showGameCompletePopup(
@@ -221,7 +223,6 @@ const createSubmitBtn = () => {
             return;
         }
         executeWithLoadingSpinner(() => {
-            console.log("guess:", guess, "colourPattern:", colourPattern);
             suggestedWords = guessHelper.getSuggestedWords(
                 guess,
                 colourPattern
@@ -230,13 +231,11 @@ const createSubmitBtn = () => {
                 showErrorPopup(
                     "No possible answers left!<br>Are you sure you entered all the colours in correctly?"
                 );
-                console.log("no suggested words");
                 return;
             } else if (suggestedWords.length == 1) {
                 showGameCompletePopup(
                     `The correct answer is <b>${suggestedWords[0]}</b>`
                 );
-                console.log("one suggested word left");
                 return;
             }
             // reset global values and re-render rows
@@ -268,15 +267,15 @@ const createUndoGuessBtn = (rowSidePanel) => {
         "active:shadow-inner"
     );
     undoGuessBtn.addEventListener("click", () => {
-        // TODO -- fix this behaviour
         guessHelper.undoLastGuess();
-        console.log("activeGuessArr:", activeGuessArr);
-        console.log("activeGuessColourClasses:", activeGuessColourClasses);
         const activeGuessStr = submittedGuesses.pop();
         activeGuessArr = activeGuessStr.split("");
         activeGuessColourClasses = submittedColourClasses.pop();
-        console.log("activeGuessArr:", activeGuessArr);
-        console.log("activeGuessColourClasses:", activeGuessColourClasses);
+        const guess = submittedGuesses[submittedGuesses.length - 1];
+        const colourPattern = getColourPatternFromClasses(
+            submittedColourClasses[submittedColourClasses.length - 1]
+        );
+        suggestedWords = guessHelper.getSuggestedWords(guess, colourPattern);
         renderAllRows();
     });
     rowSidePanel.classList.toggle("justify-start");
@@ -326,10 +325,6 @@ rows.forEach((row) => {
                     panel.classList.toggle(cls);
                     panel.classList.toggle(nextCls);
                     activeGuessColourClasses[panelIdx] = nextCls;
-                    console.log(
-                        "updated panel in ACGC:",
-                        activeGuessColourClasses
-                    );
                     break;
                 }
             }
@@ -377,11 +372,9 @@ document
 window.mainJsInit = () => {
     // optimalFirstGuesses defined in wasm
     suggestedWords = optimalFirstGuesses;
-    console.log(suggestedWords);
     renderAllRows();
     const seenHelpPopup = localStorage.getItem("seenHelpPopup");
     if (!seenHelpPopup) {
         showGameHelpPopup();
     }
-    console.log("guessHelper numGuesses:", guessHelper.guesses());
 };
