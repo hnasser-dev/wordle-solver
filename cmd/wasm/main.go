@@ -88,16 +88,10 @@ func main() {
 		return returnArr
 	})
 
-	jsGuessHelper.Set("guesses", js.FuncOf(func(_ js.Value, args []js.Value) any {
-		jsGuesses := js.Global().Get("Array").New()
-		for _, guess := range guessHelper.Guesses {
-			jsGuesses.Call("push", guess)
-		}
-		return jsGuesses
-	}))
 	jsGuessHelper.Set("getSuggestedWords", getSuggestedWords)
 	jsGuessHelper.Set("undoLastGuess", js.FuncOf(func(_ js.Value, args []js.Value) any {
-		if err := guessHelper.RevertLastGuess(); err != game.ErrNoGuesses {
+		if err := guessHelper.RevertLastGuess(); err != nil && err != game.ErrNoGuesses {
+			log.Printf("error: %s", err.Error())
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to revert last guess - err: %s", err))
 		}
 		return nil
