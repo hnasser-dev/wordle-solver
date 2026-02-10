@@ -9,6 +9,14 @@ import (
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
+var (
+	guessHelper *game.GuessHelper
+
+	jsResetGuessHelper  js.Func
+	jsGetSuggestedWords js.Func
+	jsUndoLastGuess     js.Func
+)
+
 func sliceToJsArray[T any](s []T) js.Value {
 	arr := make([]any, len(s))
 	for i, v := range s {
@@ -28,20 +36,17 @@ func main() {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to fetch word frequency map - err: %s", err))
 	}
 
-	guessHelper, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
+	gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 	}
+	guessHelper = gh
 
 	validGuesses := words.GetValidGuesses()
 	jsAllValidGuesses := js.Global().Get("Set").New()
 	for _, guess := range validGuesses {
 		jsAllValidGuesses.Call("add", guess)
 	}
-	js.Global().Set("allValidGuessesList", jsAllValidGuesses)
-
-	// default normal mode
-	gameMode := game.NormalMode
 
 	sortedOptimalFirstGuesses := words.GetOptimalFirstGuessesList()
 	topN := 100
@@ -53,11 +58,7 @@ func main() {
 		jsOptimalFirstGuesses.Call("push", guess)
 	}
 
-	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
-
-	jsGuessHelper := js.Global().Get("Object").New()
-	// getSuggestedWords(guess string, colourPattern []string)
-	getSuggestedWords := js.FuncOf(func(_ js.Value, args []js.Value) any {
+	jsGetSuggestedWords = js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) != 2 {
 			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestedWords - must be 2")
 		}
@@ -68,7 +69,7 @@ func main() {
 		}
 		colourStringsLength := jsColourStringsArr.Length()
 		if colourStringsLength != game.WordLength {
-			return js.Global().Get("Error").New(fmt.Sprintf("colour pattern must be of length %d"))
+			return js.Global().Get("Error").New(fmt.Sprintf("colour pattern must be of length %d", game.WordLength))
 		}
 		var colourStringsSlice [game.WordLength]string
 		for i := 0; i < len(colourStringsSlice); i++ {
@@ -80,7 +81,7 @@ func main() {
 		}
 		guessHelper.MakeGuess(guess, colourPattern)
 		log.Printf("guesses: %s", guessHelper.Guesses)
-		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(gameMode)
+		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(game.NormalMode)
 		returnArr := js.Global().Get("Array").New()
 		for _, guessOutcome := range sortedGuessOutcomes {
 			returnArr.Call("push", guessOutcome.Guess)
@@ -88,17 +89,19 @@ func main() {
 		return returnArr
 	})
 
-	jsGuessHelper.Set("getSuggestedWords", getSuggestedWords)
-	jsGuessHelper.Set("undoLastGuess", js.FuncOf(func(_ js.Value, args []js.Value) any {
+	jsUndoLastGuess = js.FuncOf(func(_ js.Value, args []js.Value) any {
+		gh := guessHelper
+		if gh == nil {
+			return js.Global().Get("Error").New("guessHelper not yet initialised")
+		}
 		if err := guessHelper.RevertLastGuess(); err != nil && err != game.ErrNoGuesses {
 			log.Printf("error: %s", err.Error())
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to revert last guess - err: %s", err))
 		}
 		return nil
-	}))
-	js.Global().Set("guessHelper", jsGuessHelper)
+	})
 
-	resetGuessHelper := js.FuncOf(func(_ js.Value, args []js.Value) any {
+	jsResetGuessHelper = js.FuncOf(func(_ js.Value, args []js.Value) any {
 		gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
 		if err != nil {
 			js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
@@ -106,8 +109,16 @@ func main() {
 		guessHelper = gh
 		return nil
 	})
+	js.Global().Set("resetGuessHelper", jsResetGuessHelper)
 
-	js.Global().Set("resetGuessHelper", resetGuessHelper)
+	jsGuessHelper := js.Global().Get("Object").New()
+	jsGuessHelper.Set("getSuggestedWords", jsGetSuggestedWords)
+	jsGuessHelper.Set("undoLastGuess", jsUndoLastGuess)
+	jsGuessHelper.Set("resetGuessHelper", jsResetGuessHelper)
+	js.Global().Set("guessHelper", jsGuessHelper)
+
+	js.Global().Set("allValidGuessesList", jsAllValidGuesses)
+	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
 
 	select {}
 }
