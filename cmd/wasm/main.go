@@ -12,9 +12,10 @@ import (
 var (
 	guessHelper *game.GuessHelper
 
-	jsResetGuessHelper  js.Func
-	jsGetSuggestedWords js.Func
-	jsUndoLastGuess     js.Func
+	jsResetGuessHelper        js.Func
+	jsGetSuggestedWords       js.Func
+	jsUndoLastGuess           js.Func
+	jsGetLatestSuggestedWords js.Func
 )
 
 func sliceToJsArray[T any](s []T) js.Value {
@@ -104,19 +105,27 @@ func main() {
 	jsResetGuessHelper = js.FuncOf(func(_ js.Value, args []js.Value) any {
 		gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
 		if err != nil {
-			js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
+			return js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 		}
 		guessHelper = gh
 		return nil
 	})
-	js.Global().Set("resetGuessHelper", jsResetGuessHelper)
+
+	jsGetLatestSuggestedWords = js.FuncOf(func(_ js.Value, args []js.Value) any {
+		if len(guessHelper.WordLists) == 0 {
+			return js.Global().Get("Error").New("no suggested words available")
+		}
+		lastIdx := len(guessHelper.WordLists) - 1
+		return sliceToJsArray(guessHelper.WordLists[lastIdx])
+	})
 
 	jsGuessHelper := js.Global().Get("Object").New()
 	jsGuessHelper.Set("getSuggestedWords", jsGetSuggestedWords)
 	jsGuessHelper.Set("undoLastGuess", jsUndoLastGuess)
-	jsGuessHelper.Set("resetGuessHelper", jsResetGuessHelper)
+	jsGuessHelper.Set("getLatestSuggestedWords", jsGetLatestSuggestedWords)
 	js.Global().Set("guessHelper", jsGuessHelper)
 
+	js.Global().Set("resetGuessHelper", jsResetGuessHelper)
 	js.Global().Set("allValidGuessesList", jsAllValidGuesses)
 	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
 
