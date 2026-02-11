@@ -4,7 +4,7 @@
 
 ### Accessible at: [hnasser-dev.github.io/wordle-solver/](https://hnasser-dev.github.io/wordle-solver/)
 
-<img width="699" height="887" alt="image" src="https://github.com/user-attachments/assets/bee083be-9d56-4847-9c61-5d850643f23d" />
+<img width="663" height="855" alt="image" src="https://github.com/user-attachments/assets/7eeb3dbb-6972-472d-91eb-6743f6f17b22" />
 
 ### Instructions
 
