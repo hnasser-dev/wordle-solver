@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"syscall/js"
 
 	"github.com/hnasser-dev/wordle-solver/internal/game"
@@ -81,9 +80,6 @@ func main() {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse colour strings: %s", err))
 		}
 		guessHelper.MakeGuess(guess, colourPattern)
-		log.Printf("guesses: %s", guessHelper.AllGuesses)
-		log.Printf("wordLists: %s", guessHelper.AllGuesses)
-		log.Printf("guesses: %s", guessHelper.AllGuesses)
 		sortedGuessOutcomes := guessHelper.AllSortedGuessOutcomes[len(guessHelper.AllSortedGuessOutcomes)-1]
 		returnArr := js.Global().Get("Array").New()
 		for _, guessOutcome := range sortedGuessOutcomes {
@@ -98,7 +94,6 @@ func main() {
 			return js.Global().Get("Error").New("guessHelper not yet initialised")
 		}
 		if err := guessHelper.RevertLastGuess(); err != nil && err != game.ErrNoGuesses {
-			log.Printf("error: %s", err.Error())
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to revert last guess - err: %s", err))
 		}
 		return nil
