@@ -114,8 +114,9 @@ func main() {
 	})
 
 	jsGetLatestSuggestedWords = js.FuncOf(func(_ js.Value, args []js.Value) any {
+		// no guesses made - return the default first word list
 		if len(guessHelper.AllSortedGuessOutcomes) == 0 {
-			return js.Global().Get("Error").New("no suggested words available")
+			return jsOptimalFirstGuesses
 		}
 		latestGuessOutcomes := guessHelper.AllSortedGuessOutcomes[len(guessHelper.AllSortedGuessOutcomes)-1]
 		suggestedWords := make([]string, len(latestGuessOutcomes))
