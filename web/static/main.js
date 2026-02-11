@@ -255,12 +255,11 @@ const createUndoGuessBtn = (rowSidePanel) => {
     undoGuessBtn.innerHTML = "&#9100;";
     undoGuessBtn.classList.add(
         "text-white",
-        "text-2xl",
-        "md:text-3xl",
         "p-2",
         "ml-1",
-        "text-sm",
-        "md:text-md",
+        "text-2xl",
+        "sm:text-3xl",
+        "md:text-4xl",
         "font-bold",
         "cursor-pointer",
         "active:translate-y-0.5",
