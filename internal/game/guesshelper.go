@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 	"maps"
-	"slices"
 
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
@@ -17,23 +16,25 @@ import (
 var ErrNoGuesses = errors.New("no guesses have been made")
 
 type GuessHelperConfig struct {
-	WordList []string
-	FreqMap  words.WordFrequencyMap
+	AllPossibleAnswers []string
+	FreqMap            words.WordFrequencyMap
 }
 
 type GuessHelper struct {
-	FreqMap   words.WordFrequencyMap
-	Guesses   []string
-	WordLists [][]string // length: len(Guesses) + 1
+	// GameMode                 GameMode
+	FreqMap                     words.WordFrequencyMap
+	AllRemainingPossibleAnswers [][]string // length: len(Guesses) + 1
+	AllGuesses                  []string
+	AllSortedGuessOutcomes      [][]guessOutcome
 }
 
 func NewGuessHelper(config GuessHelperConfig) (*GuessHelper, error) {
 	var err error
-	var initialWordList []string
-	if config.WordList == nil {
-		initialWordList = words.GetPossibleAnswers()
+	var allPossibleAnswers []string
+	if config.AllPossibleAnswers == nil {
+		allPossibleAnswers = words.GetPossibleAnswers()
 	} else {
-		initialWordList = append([]string{}, config.WordList...) // copy
+		allPossibleAnswers = append([]string{}, config.AllPossibleAnswers...) // copy
 	}
 	freqMap := words.WordFrequencyMap{}
 	if config.FreqMap == nil {
@@ -44,36 +45,26 @@ func NewGuessHelper(config GuessHelperConfig) (*GuessHelper, error) {
 	} else {
 		maps.Copy(freqMap, config.FreqMap)
 	}
-	guessHelper := GuessHelper{FreqMap: freqMap, WordLists: [][]string{initialWordList}}
+	guessHelper := GuessHelper{FreqMap: freqMap, AllRemainingPossibleAnswers: [][]string{allPossibleAnswers}}
 	return &guessHelper, nil
 }
 
 func (g *GuessHelper) MakeGuess(guess string, pattern colourPattern) {
-	remainingWords := g.WordLists[len(g.Guesses)]
-	guessDistribution := computeGuessDistribution(guess, remainingWords)
-	g.WordLists = append(g.WordLists, guessDistribution[pattern])
-	g.Guesses = append(g.Guesses, guess)
-}
-
-func (g *GuessHelper) GetSortedGuessOutcomes(gameMode GameMode) []guessOutcome {
-	remainingWords := g.WordLists[len(g.Guesses)]
-	sortedGuessOutcomes := getSortedGuessOutcomes(remainingWords, g.FreqMap)
-	switch gameMode {
-	case DumbMode:
-		slices.Reverse(sortedGuessOutcomes)
-	case NormalMode:
-		// do nothing
-	default:
-		panic(fmt.Sprintf("unknown gameMode: %d", gameMode))
-	}
-	return sortedGuessOutcomes
+	possibleAnswers := g.AllRemainingPossibleAnswers[len(g.AllRemainingPossibleAnswers)-1]
+	guessDistribution := computeGuessDistribution(guess, possibleAnswers)
+	nextPossibleAnswers := guessDistribution[pattern]
+	sortedGuessOutcomes := GetSortedGuessOutcomes(nextPossibleAnswers, g.FreqMap)
+	g.AllRemainingPossibleAnswers = append(g.AllRemainingPossibleAnswers, nextPossibleAnswers)
+	g.AllGuesses = append(g.AllGuesses, guess)
+	g.AllSortedGuessOutcomes = append(g.AllSortedGuessOutcomes, sortedGuessOutcomes)
 }
 
 func (g *GuessHelper) RevertLastGuess() error {
-	if len(g.Guesses) == 0 {
+	if len(g.AllGuesses) == 0 {
 		return ErrNoGuesses
 	}
-	g.Guesses = g.Guesses[:len(g.Guesses)-1]
-	g.WordLists = g.WordLists[:len(g.WordLists)-1]
+	g.AllGuesses = g.AllGuesses[:len(g.AllGuesses)-1]
+	g.AllRemainingPossibleAnswers = g.AllRemainingPossibleAnswers[:len(g.AllRemainingPossibleAnswers)-1]
+	g.AllSortedGuessOutcomes = g.AllSortedGuessOutcomes[:len(g.AllSortedGuessOutcomes)-1]
 	return nil
 }

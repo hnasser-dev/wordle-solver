@@ -271,12 +271,7 @@ const createUndoGuessBtn = (rowSidePanel) => {
         const activeGuessStr = submittedGuesses.pop();
         activeGuessArr = activeGuessStr.split("");
         activeGuessColourClasses = submittedColourClasses.pop();
-        // const guess = submittedGuesses[submittedGuesses.length - 1];
-        // const colourPattern = getColourPatternFromClasses(
-        //     submittedColourClasses[submittedColourClasses.length - 1]
-        // );
         suggestedWords = guessHelper.getLatestSuggestedWords();
-        // suggestedWords = guessHelper.getSuggestedWords(guess, colourPattern);
         console.log("suggestedWords", suggestedWords);
         console.log("submittedGuesses", submittedGuesses);
         renderAllRows();

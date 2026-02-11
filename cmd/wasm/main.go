@@ -30,14 +30,14 @@ func main() {
 
 	var err error
 
-	possibleAnswers := words.GetPossibleAnswers()
+	allPossibleAnswers := words.GetPossibleAnswers()
 
 	freqMap, err := words.GetWordFrequencyMap()
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to fetch word frequency map - err: %s", err))
 	}
 
-	gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
+	gh, err := game.NewGuessHelper(game.GuessHelperConfig{AllPossibleAnswers: allPossibleAnswers, FreqMap: freqMap})
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 	}
@@ -81,8 +81,10 @@ func main() {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse colour strings: %s", err))
 		}
 		guessHelper.MakeGuess(guess, colourPattern)
-		log.Printf("guesses: %s", guessHelper.Guesses)
-		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(game.NormalMode)
+		log.Printf("guesses: %s", guessHelper.AllGuesses)
+		log.Printf("wordLists: %s", guessHelper.AllGuesses)
+		log.Printf("guesses: %s", guessHelper.AllGuesses)
+		sortedGuessOutcomes := guessHelper.AllSortedGuessOutcomes[len(guessHelper.AllSortedGuessOutcomes)-1]
 		returnArr := js.Global().Get("Array").New()
 		for _, guessOutcome := range sortedGuessOutcomes {
 			returnArr.Call("push", guessOutcome.Guess)
@@ -103,7 +105,7 @@ func main() {
 	})
 
 	jsResetGuessHelper = js.FuncOf(func(_ js.Value, args []js.Value) any {
-		gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
+		gh, err := game.NewGuessHelper(game.GuessHelperConfig{AllPossibleAnswers: allPossibleAnswers, FreqMap: freqMap})
 		if err != nil {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 		}
@@ -112,11 +114,15 @@ func main() {
 	})
 
 	jsGetLatestSuggestedWords = js.FuncOf(func(_ js.Value, args []js.Value) any {
-		if len(guessHelper.WordLists) == 0 {
+		if len(guessHelper.AllSortedGuessOutcomes) == 0 {
 			return js.Global().Get("Error").New("no suggested words available")
 		}
-		lastIdx := len(guessHelper.WordLists) - 1
-		return sliceToJsArray(guessHelper.WordLists[lastIdx])
+		latestGuessOutcomes := guessHelper.AllSortedGuessOutcomes[len(guessHelper.AllSortedGuessOutcomes)-1]
+		suggestedWords := make([]string, len(latestGuessOutcomes))
+		for idx := range latestGuessOutcomes {
+			suggestedWords[idx] = latestGuessOutcomes[idx].Guess
+		}
+		return sliceToJsArray(suggestedWords)
 	})
 
 	jsGuessHelper := js.Global().Get("Object").New()

@@ -96,7 +96,7 @@ func (g *GameSimulator) PerformGuess(guess string) bool {
 }
 
 func (g *GameSimulator) PerformOptimalGuess() bool {
-	sortedRemainingOutcomes := getSortedGuessOutcomes(g.RemainingWordList, g.FreqMap)
+	sortedRemainingOutcomes := GetSortedGuessOutcomes(g.RemainingWordList, g.FreqMap)
 	var guess string
 	switch g.GameMode {
 	case DumbMode:
