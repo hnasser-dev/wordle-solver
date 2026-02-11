@@ -24,3 +24,9 @@
 - This repository contains some additional code which doesn't run in the web application.
 - Most notably, some Go code that allows you to simulate games, including with user-specified first guesses, and a "dumb" mode that will select the *least* optimal guesses.
 - Feel free to play around with these if you like.
+
+### Personal Comments
+
+#### This project isn’t really an ideal use case for WASM.
+#### I initially started this project to gain more experience with Go and expected that some functionality would require a backend. However, it soon became apparent that I could make it work with just a static website. Despite this, I chose not to translate the code to JavaScript and instead experimented with WASM.
+#### What I learned: WASM introduces unneeded complexity for a small project like this. The business logic would likely have been cleaner and more concise if written in JavaScript, and the page size would have been smaller as well. That being said, it was fun using WASM for the first time, and I can definitely see its merits! It just wasn't ideal for this particular project.
