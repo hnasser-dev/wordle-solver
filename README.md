@@ -15,7 +15,7 @@
 - Click on the tiles to toggle their colours - ensure the colours match what you observed in the Wordle game.
 - Click `Submit`, and the solver will auto-populate the next row with the optimal* next guess.
 - Repeat the process outlined above (make a guess, input information about your guess into the solver, then follow the optimal guess suggested at each step).
-- If you make a mistake at any time, click `Restart` or refresh the page.
+- If you make a mistake at any time, you may `Undo` your guess, `Restart` the game or refresh the page.
 
 #### \* The guess that will, on average, reduce the number of remaining possible answers by the largest amount. This does not necessarily result in an optimal game.
 
