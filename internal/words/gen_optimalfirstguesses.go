@@ -15,7 +15,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	sortedFirstGuessOutcomes := guessHelper.GetSortedGuessOutcomes(game.NormalMode)
+	sortedFirstGuessOutcomes := game.GetSortedGuessOutcomes(guessHelper.AllRemainingPossibleAnswers[0], guessHelper.FreqMap)
 	sortedOptimalGuesses := make([]string, len(sortedFirstGuessOutcomes))
 	for i, outcome := range sortedFirstGuessOutcomes {
 		sortedOptimalGuesses[i] = outcome.Guess

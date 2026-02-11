@@ -42,7 +42,7 @@ func (m GameMode) Valid() bool {
 	}
 }
 
-func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequencyMap) []guessOutcome {
+func GetSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequencyMap) []guessOutcome {
 
 	guessDistributions := map[string]guessDistribution{}
 	for _, potentialGuess := range remainingWords {
@@ -78,18 +78,6 @@ func getSortedGuessOutcomes(remainingWords []string, freqMap words.WordFrequency
 	return guessOutcomes
 }
 
-func computeGuessDistribution(guess string, wordList []string) guessDistribution {
-	dist := guessDistribution{}
-	for _, potentialAnswer := range wordList {
-		if potentialAnswer == guess {
-			continue
-		}
-		colourPattern := getColourPattern(guess, potentialAnswer)
-		dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
-	}
-	return dist
-}
-
 func ColourStringsToColourPattern(colourSlice [WordLength]string) (colourPattern, error) {
 	var c colourPattern
 	for i, colourString := range colourSlice {
@@ -106,4 +94,16 @@ func ColourStringsToColourPattern(colourSlice [WordLength]string) (colourPattern
 		}
 	}
 	return c, nil
+}
+
+func computeGuessDistribution(guess string, wordList []string) guessDistribution {
+	dist := guessDistribution{}
+	for _, potentialAnswer := range wordList {
+		if potentialAnswer == guess {
+			continue
+		}
+		colourPattern := getColourPattern(guess, potentialAnswer)
+		dist[colourPattern] = append(dist[colourPattern], potentialAnswer)
+	}
+	return dist
 }

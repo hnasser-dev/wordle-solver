@@ -8,6 +8,15 @@ import (
 	"github.com/hnasser-dev/wordle-solver/internal/words"
 )
 
+var (
+	guessHelper *game.GuessHelper
+
+	jsResetGuessHelper        js.Func
+	jsGetSuggestedWords       js.Func
+	jsUndoLastGuess           js.Func
+	jsGetLatestSuggestedWords js.Func
+)
+
 func sliceToJsArray[T any](s []T) js.Value {
 	arr := make([]any, len(s))
 	for i, v := range s {
@@ -20,27 +29,24 @@ func main() {
 
 	var err error
 
-	possibleAnswers := words.GetPossibleAnswers()
+	allPossibleAnswers := words.GetPossibleAnswers()
 
 	freqMap, err := words.GetWordFrequencyMap()
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to fetch word frequency map - err: %s", err))
 	}
 
-	guessHelper, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
+	gh, err := game.NewGuessHelper(game.GuessHelperConfig{AllPossibleAnswers: allPossibleAnswers, FreqMap: freqMap})
 	if err != nil {
 		js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 	}
+	guessHelper = gh
 
 	validGuesses := words.GetValidGuesses()
 	jsAllValidGuesses := js.Global().Get("Set").New()
 	for _, guess := range validGuesses {
 		jsAllValidGuesses.Call("add", guess)
 	}
-	js.Global().Set("allValidGuessesList", jsAllValidGuesses)
-
-	// default normal mode
-	gameMode := game.NormalMode
 
 	sortedOptimalFirstGuesses := words.GetOptimalFirstGuessesList()
 	topN := 100
@@ -52,13 +58,9 @@ func main() {
 		jsOptimalFirstGuesses.Call("push", guess)
 	}
 
-	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
-
-	jsGuessHelper := js.Global().Get("Object").New()
-	// getSuggestions(guess string, colourPattern []string)
-	getSuggestions := js.FuncOf(func(_ js.Value, args []js.Value) any {
+	jsGetSuggestedWords = js.FuncOf(func(_ js.Value, args []js.Value) any {
 		if len(args) != 2 {
-			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestions - must be 2")
+			return js.Global().Get("Error").New("Incorrect number of arguments to getSuggestedWords - must be 2")
 		}
 		guess := args[0].String()
 		jsColourStringsArr := args[1]
@@ -67,7 +69,7 @@ func main() {
 		}
 		colourStringsLength := jsColourStringsArr.Length()
 		if colourStringsLength != game.WordLength {
-			return js.Global().Get("Error").New(fmt.Sprintf("colour pattern must be of length %d"))
+			return js.Global().Get("Error").New(fmt.Sprintf("colour pattern must be of length %d", game.WordLength))
 		}
 		var colourStringsSlice [game.WordLength]string
 		for i := 0; i < len(colourStringsSlice); i++ {
@@ -77,8 +79,8 @@ func main() {
 		if err != nil {
 			return js.Global().Get("Error").New(fmt.Sprintf("unable to parse colour strings: %s", err))
 		}
-		guessHelper.FilterRemainingWords(guess, colourPattern)
-		sortedGuessOutcomes := guessHelper.GetSortedGuessOutcomes(gameMode)
+		guessHelper.MakeGuess(guess, colourPattern)
+		sortedGuessOutcomes := guessHelper.AllSortedGuessOutcomes[len(guessHelper.AllSortedGuessOutcomes)-1]
 		returnArr := js.Global().Get("Array").New()
 		for _, guessOutcome := range sortedGuessOutcomes {
 			returnArr.Call("push", guessOutcome.Guess)
@@ -86,19 +88,48 @@ func main() {
 		return returnArr
 	})
 
-	jsGuessHelper.Set("getSuggestions", getSuggestions)
-	js.Global().Set("guessHelper", jsGuessHelper)
+	jsUndoLastGuess = js.FuncOf(func(_ js.Value, args []js.Value) any {
+		gh := guessHelper
+		if gh == nil {
+			return js.Global().Get("Error").New("guessHelper not yet initialised")
+		}
+		if err := guessHelper.RevertLastGuess(); err != nil && err != game.ErrNoGuesses {
+			return js.Global().Get("Error").New(fmt.Sprintf("unable to revert last guess - err: %s", err))
+		}
+		return nil
+	})
 
-	resetGuessHelper := js.FuncOf(func(_ js.Value, args []js.Value) any {
-		gh, err := game.NewGuessHelper(game.GuessHelperConfig{WordList: possibleAnswers, FreqMap: freqMap})
+	jsResetGuessHelper = js.FuncOf(func(_ js.Value, args []js.Value) any {
+		gh, err := game.NewGuessHelper(game.GuessHelperConfig{AllPossibleAnswers: allPossibleAnswers, FreqMap: freqMap})
 		if err != nil {
-			js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
+			return js.Global().Get("Error").New(fmt.Sprintf("unable to create guessHelper - err: %s", err))
 		}
 		guessHelper = gh
 		return nil
 	})
 
-	js.Global().Set("resetGuessHelper", resetGuessHelper)
+	jsGetLatestSuggestedWords = js.FuncOf(func(_ js.Value, args []js.Value) any {
+		// no guesses made - return the default first word list
+		if len(guessHelper.AllSortedGuessOutcomes) == 0 {
+			return jsOptimalFirstGuesses
+		}
+		latestGuessOutcomes := guessHelper.AllSortedGuessOutcomes[len(guessHelper.AllSortedGuessOutcomes)-1]
+		suggestedWords := make([]string, len(latestGuessOutcomes))
+		for idx := range latestGuessOutcomes {
+			suggestedWords[idx] = latestGuessOutcomes[idx].Guess
+		}
+		return sliceToJsArray(suggestedWords)
+	})
+
+	jsGuessHelper := js.Global().Get("Object").New()
+	jsGuessHelper.Set("getSuggestedWords", jsGetSuggestedWords)
+	jsGuessHelper.Set("undoLastGuess", jsUndoLastGuess)
+	jsGuessHelper.Set("getLatestSuggestedWords", jsGetLatestSuggestedWords)
+	js.Global().Set("guessHelper", jsGuessHelper)
+
+	js.Global().Set("resetGuessHelper", jsResetGuessHelper)
+	js.Global().Set("allValidGuessesList", jsAllValidGuesses)
+	js.Global().Set("optimalFirstGuesses", jsOptimalFirstGuesses)
 
 	select {}
 }

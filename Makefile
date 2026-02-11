@@ -1,20 +1,22 @@
 newdist:
 	rm -rf dist
-	mkdir -p dist
+	mkdir -p dist/assets
 
 data:
 	go generate ./...
 
 wasm:
 	GOOS=js GOARCH=wasm go build -o dist/main.wasm ./cmd/wasm
-	cp web/static/wasm_exec.js dist/
+
+styling:
+	npx @tailwindcss/cli -i ./web/static/input.css -o ./dist/main.css
 
 static:
-	npx @tailwindcss/cli -i ./web/static/input.css -o ./dist/main.css
 	cp web/static/index.html dist/
 	cp web/static/main.js dist/
-	cp web/static/favicon.ico dist/
+	cp web/static/wasm_exec.js dist/
+	cp web/static/assets/favicon.ico dist/assets/
 
-build: newdist data wasm static
+build: newdist data wasm styling static
 	@echo "Build complete - populated into dist/"
  
