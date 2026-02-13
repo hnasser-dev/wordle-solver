@@ -111,7 +111,6 @@ const updateRowLetterPanels = (row, rowIdx) => {
         removeBgColours(panel);
         removeOpacity(panel);
         if (isActiveRow) {
-            console.log(`active row idx = ${rowIdx}`);
             panel.innerHTML =
                 panelIdx < activeGuessArr.length
                     ? activeGuessArr[panelIdx]
@@ -168,9 +167,6 @@ const createSelector = (row, rowIdx) => {
     const selectorOnChange = () => {
         const selectedValue = selector.options[selector.selectedIndex].value;
         activeGuessArr = selectedValue.toLowerCase().split("");
-        console.log(
-            `inside selectorOnChange, calling updateLetterPanels -- rowIdx=${rowIdx}, activeGuessArr=${activeGuessArr}, guesses=${submittedGuesses}`
-        );
         updateRowLetterPanels(row, rowIdx);
     };
     selector.addEventListener("change", selectorOnChange);
@@ -216,9 +212,6 @@ const handleSubmit = () => {
         submittedColourClasses.push([...activeGuessColourClasses]);
         activeGuessArr = suggestedWords[0].split("");
         activeGuessColourClasses = Array(5).fill("bg-gray-50");
-        console.log(
-            `inside click event for submit button - calling renderAllRows with submittedGuesses=${submittedGuesses}, activeGuessArr=${activeGuessArr}`
-        );
         renderAllRows();
     });
 };
@@ -295,9 +288,6 @@ const handlePressKey = (key) => {
     isLetter = charIsLetter(key);
     isBackspace = key === "Backspace";
     isEnter = key === "Enter";
-    console.log(
-        `isLetter: ${isLetter}, isBackspace: ${isBackspace}, isEnter: ${isEnter}`
-    );
     if (isLetter || isBackspace || isEnter) {
         if (isEnter) {
             handleSubmit();
@@ -315,7 +305,6 @@ const handlePressKey = (key) => {
         const activeRow = document.querySelector(
             `#game-row-${submittedGuesses.length}`
         );
-        console.log("inside handlePressKey, calling updateRowLetterPanels");
         updateRowLetterPanels(activeRow, submittedGuesses.length);
     }
 };
@@ -325,7 +314,6 @@ document.addEventListener("keydown", (event) => {
     if (event.repeat) {
         return;
     }
-    console.log("just pressed enter, calling handlePressKey");
     handlePressKey(event.key);
 });
 
